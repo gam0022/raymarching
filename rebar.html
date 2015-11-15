@@ -1,4 +1,5 @@
-<html><head><!-- fragment shader --><script id="fs" type="x-shader/x-fragment">precision mediump float;
+<html><head><!-- fragment shader --><script id="fs" type="x-shader/x-fragment">
+precision mediump float;
 uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
@@ -101,4 +102,5 @@ void main(void){
 <body>
   <canvas id="canvas"></canvas>
   <p><input type="checkbox" id="check" checked><label for="check"> auto run</label></p>
+  <p><input type="button" value="save image" onclick="saveImage();"></p>
 </body></html>

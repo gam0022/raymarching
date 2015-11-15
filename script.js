@@ -226,3 +226,8 @@ function create_ibo(data){
 	// 生成したIBOを返して終了
 	return ibo;
 }
+
+function saveImage() {
+  render();
+  window.open(c.toDataURL());
+}
