@@ -3,76 +3,37 @@ uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
 
-const float PI = 3.14159265358979323846;
-
-vec3 onRep(vec3 p, vec3 c) {
-  return mod(p, c) - 0.5 * c;
+vec2 onRep(vec2 p, float interval) {
+  return mod(p, interval) - interval * 0.5;
 }
 
-vec2 onRep(vec2 p, float c) {
-  return mod(p, c) - 0.5 * c;
+float distBar(vec2 p, float interval, float width) {
+  return length(max(abs(onRep(p, interval)) - width, 0.0));
 }
 
-float displacement(vec3 p) {
-  float a = 0.0;
-  float b = PI * 10.0;
-  float c = 0.5 * PI;
-  return a * sin(b * p.x) * cos(b * p.y) * cos(b * p.z);
-}
-
-float udRoundBox( vec3 p, vec3 b, float r )
-{
-  return length(max(abs(p)-b,0.0))-r;
-}
-
-// box distance function
-float distFuncBox(vec3 p){
-  float a = mod(0.02 * time, 0.2) + 0.01;
-  return length(max(abs(p) - vec3(a, a, a), 0.0)) - 0.05;
-}
-
-// torus distance function
-float distFuncTorus(vec3 p){
-  vec2 t = vec2(1.5, 0.25);
-  vec2 r = vec2(length(p.xy) - t.x, p.z);
-  return length(r) - t.y;
-}
-
-float distFuncSphere(vec3 p) {
-  return length(p) - 0.2;
+float distTube(vec2 p, float interval, float width) {
+  return length(onRep(p, interval)) - width;
 }
 
 // distance function
-float distFunc(vec3 p){
-  vec3 c = vec3(1.0, 1.0, 1.0);
-  float d2 = distFuncSphere(onRep(p,c));
+float distScene(vec3 p){
+  float bar_x = distBar(p.yz, 1.0, 0.1);
+  float bar_y = distBar(p.xz, 1.0, 0.1);
+  float bar_z = distBar(p.xy, 1.0, 0.1);
 
-  float bar_p = 1.0;
-  float bar_w = 0.1;
-  float bar_x = length(max(abs(mod(p.yz, bar_p) - bar_p * 0.5) - bar_w, 0.0));
-  float bar_y = length(max(abs(mod(p.xz, bar_p) - bar_p * 0.5) - bar_w, 0.0));
-  float bar_z = length(max(abs(mod(p.xy, bar_p) - bar_p * 0.5) - bar_w, 0.0));
-
-  float tube_p = 0.1;
-  float tube_w = 0.025;
-  float tube_x = length(mod(p.yz, tube_p) - tube_p * 0.5) - tube_w;
-  float tube_y = length(mod(p.xz, tube_p) - tube_p * 0.5) - tube_w;
-  float tube_z = length(mod(p.xy, tube_p) - tube_p * 0.5) - tube_w;
+  float tube_x = distTube(p.yz, 0.1, 0.025);
+  float tube_y = distTube(p.xz, 0.1, 0.025);
+  float tube_z = distTube(p.xy, 0.1, 0.025);
 
   return max(max(max(min(min(bar_x, bar_y),bar_z), -tube_x), -tube_y), -tube_z);
-
-  //return min(d1, d2);  // 同時に描く
-  //return max(d1, d2);  // 重なっている部分だけを描く
-  //return max(-d1, d2); // d1が重なっていないd2部分を描く
-  //return max(d1, -d2); // d2が重なっていないd1部分を描く
 }
 
-vec3 genNormal(vec3 p){
+vec3 getNormal(vec3 p){
   float d = 0.0001;
   return normalize(vec3(
-    distFunc(p + vec3(  d, 0.0, 0.0)) - distFunc(p + vec3( -d, 0.0, 0.0)),
-    distFunc(p + vec3(0.0,   d, 0.0)) - distFunc(p + vec3(0.0,  -d, 0.0)),
-    distFunc(p + vec3(0.0, 0.0,   d)) - distFunc(p + vec3(0.0, 0.0,  -d))
+    distScene(p + vec3(  d, 0.0, 0.0)) - distScene(p + vec3( -d, 0.0, 0.0)),
+    distScene(p + vec3(0.0,   d, 0.0)) - distScene(p + vec3(0.0,  -d, 0.0)),
+    distScene(p + vec3(0.0, 0.0,   d)) - distScene(p + vec3(0.0, 0.0,  -d))
   ));
 }
 
@@ -81,36 +42,38 @@ void main(void){
   vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
 
   // camera and ray
-  vec3 cPos = vec3(0.0,  0.0,  0.0 + time);
+  vec3 cPos = vec3(0.0, 0.0, time);
   vec3 cDir = normalize(vec3(0.1, 0.1, 1.0));
   vec3 cUp  = normalize(vec3(0.1, 0.4, 0.0));
   vec3 cSide = cross(cDir, cUp);
   float targetDepth = 1.0;
   vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
 
+  // direction light
   vec3 lightDir = normalize(vec3(1, 1, -2));
 
   // marching loop
-  float tmp, dist;
-  tmp = 0.0;
+  float dist;
+  float depth = 0.0;
+  float eps = 0.001;
   vec3 dPos = cPos;
   for(int i = 0; i < 64; i++){
-    dist = distFunc(dPos);
-    tmp += dist;
-    dPos = cPos + tmp * ray;
-    if (abs(dist) <= 0.001) break;
+    dist = distScene(dPos);
+    depth += dist;
+    dPos = cPos + depth * ray;
+    if (abs(dist) <= eps) break;
   }
 
   // hit check
   vec3 color;
-  if(abs(dist) < 0.001){
-    vec3 normal = genNormal(dPos);
+  if(abs(dist) < eps){
+    vec3 normal = getNormal(dPos);
     float diff = clamp(dot(lightDir, normal), 0.1, 1.0);
     color = vec3(1.0, 0.1, 0.1) * diff;
   }else{
     color = vec3(0.0);
   }
-  gl_FragColor = vec4(color + 0.05 * tmp, 1.0);
+  gl_FragColor = vec4(color + 0.05 * depth, 1.0);
 }
 </script><!-- /fragment shader -->
 
