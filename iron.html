@@ -5,66 +5,24 @@ uniform vec2 resolution;
 
 const float PI = 3.14159265358979323846;
 
-vec3 onRep(vec3 p, vec3 c) {
-  return mod(p, c) - 0.5 * c;
-}
-
-vec2 onRep(vec2 p, float c) {
-  return mod(p, c) - 0.5 * c;
-}
-
-float displacement(vec3 p) {
-  float a = 0.0;
-  float b = PI * 10.0;
-  float c = 0.5 * PI;
-  return a * sin(b * p.x) * cos(b * p.y) * cos(b * p.z);
-}
-
-float udRoundBox( vec3 p, vec3 b, float r )
-{
-  return length(max(abs(p)-b,0.0))-r;
-}
-
-// box distance function
-float distFuncBox(vec3 p){
-  float a = mod(0.02 * time, 0.2) + 0.01;
-  return length(max(abs(p) - vec3(a, a, a), 0.0)) - 0.05;
-}
-
-// torus distance function
-float distFuncTorus(vec3 p){
-  vec2 t = vec2(1.5, 0.25);
-  vec2 r = vec2(length(p.xy) - t.x, p.z);
-  return length(r) - t.y;
-}
-
-float distFuncSphere(vec3 p) {
-  return length(p) - 0.2;
-}
-
 // distance function
 float distFunc(vec3 p){
   vec3 c = vec3(1.0, 1.0, 1.0);
   float d2 = distFuncSphere(onRep(p,c));
 
-  float bar_p = 1.0;
-  float bar_w = 0.1;
-  float bar_x = length(max(abs(mod(p.yz, bar_p) - bar_p * 0.5) - bar_w, 0.0));
-  float bar_y = length(max(abs(mod(p.xz, bar_p) - bar_p * 0.5) - bar_w, 0.0));
-  float bar_z = length(max(abs(mod(p.xy, bar_p) - bar_p * 0.5) - bar_w, 0.0));
+  float bar_interval = 1.0;
+  float bar_width = 0.1;
+  float bar_x = length(max(abs(mod(p.yz, bar_interval) - bar_interval * 0.5) - bar_width, 0.0));
+  float bar_y = length(max(abs(mod(p.xz, bar_interval) - bar_interval * 0.5) - bar_width, 0.0));
+  float bar_z = length(max(abs(mod(p.xy, bar_interval) - bar_interval * 0.5) - bar_width, 0.0));
 
-  float tube_p = 0.1;
-  float tube_w = 0.025;
-  float tube_x = length(mod(p.yz, tube_p) - tube_p * 0.5) - tube_w;
-  float tube_y = length(mod(p.xz, tube_p) - tube_p * 0.5) - tube_w;
-  float tube_z = length(mod(p.xy, tube_p) - tube_p * 0.5) - tube_w;
+  float tube_interval = 0.1;
+  float tube_width = 0.025;
+  float tube_x = length(mod(p.yz, tube_interval) - tube_interval * 0.5) - tube_width;
+  float tube_y = length(mod(p.xz, tube_interval) - tube_interval * 0.5) - tube_width;
+  float tube_z = length(mod(p.xy, tube_interval) - tube_interval * 0.5) - tube_width;
 
   return max(max(max(min(min(bar_x, bar_y),bar_z), -tube_x), -tube_y), -tube_z);
-
-  //return min(d1, d2);  // 同時に描く
-  //return max(d1, d2);  // 重なっている部分だけを描く
-  //return max(-d1, d2); // d1が重なっていないd2部分を描く
-  //return max(d1, -d2); // d2が重なっていないd1部分を描く
 }
 
 vec3 genNormal(vec3 p){
