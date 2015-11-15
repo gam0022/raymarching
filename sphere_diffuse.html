@@ -4,7 +4,6 @@ uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
 
-
 float distSphere(vec3 p, float r) {
   return length(p) - r;
 }
@@ -47,15 +46,15 @@ void main(void){
     dist = distScene(dPos);
     depth += dist;
     dPos = cPos + depth * ray;
-    if (abs(dist) <= eps) break;
+    if (abs(dist) < eps) break;
   }
 
   // hit check
   vec3 color;
   if(abs(dist) < eps){
     vec3 normal = getNormal(dPos);
-    float diff = clamp(dot(lightDir, normal), 0.1, 1.0);
-    color = vec3(1.0, 1.0, 1.0) * diff;
+    float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
+    color = vec3(1.0, 1.0, 1.0) * diffuse;
   }else{
     color = vec3(0.0);
   }
