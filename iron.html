@@ -1,25 +1,28 @@
-<html><head><!-- fragment shader --><script id="fs" type="x-shader/x-fragment">
-precision mediump float;
+<html><head><!-- fragment shader --><script id="fs" type="x-shader/x-fragment">precision mediump float;
 uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
 
-const vec3 cPos = vec3(-3.0,  3.5,  3.0);
-const vec3 cDir = vec3(0.577, -0.577, -0.577);
-const vec3 cUp  = vec3(0.577, 0.577, -0.577);
+const float PI = 3.14159265358979323846;
 
-const vec3 lightDir = vec3(-0.577, 0.577, 0.577);
+vec3 onRep(vec3 p, vec3 c) {
+  return mod(p, c) - 0.5 * c;
+}
 
-vec3 repetition(vec3 p) {
-  float c = 0.4;
+vec2 onRep(vec2 p, float c) {
   return mod(p, c) - 0.5 * c;
 }
 
 float displacement(vec3 p) {
-  float a = 0.05;
-  float b = 10.0;
-  float c = time * 5.0;
-  return a * sin(c + b * p.x) * sin(c + b * p.y) * sin(c + b * p.z);
+  float a = 0.0;
+  float b = PI * 10.0;
+  float c = 0.5 * PI;
+  return a * sin(b * p.x) * cos(b * p.y) * cos(b * p.z);
+}
+
+float udRoundBox( vec3 p, vec3 b, float r )
+{
+  return length(max(abs(p)-b,0.0))-r;
 }
 
 // box distance function
@@ -36,14 +39,28 @@ float distFuncTorus(vec3 p){
 }
 
 float distFuncSphere(vec3 p) {
-  return length(p) - 3.0;
+  return length(p) - 0.2;
 }
 
 // distance function
 float distFunc(vec3 p){
-  float d1 = distFuncSphere(p) + displacement(p);
-  return d1;
-  //float d2 = distFuncBox(repetition(p));
+  vec3 c = vec3(1.0, 1.0, 1.0);
+  float d2 = distFuncSphere(onRep(p,c));
+
+  float bar_p = 1.0;
+  float bar_w = 0.1;
+  float bar_x = length(max(abs(mod(p.yz, bar_p) - bar_p * 0.5) - bar_w, 0.0));
+  float bar_y = length(max(abs(mod(p.xz, bar_p) - bar_p * 0.5) - bar_w, 0.0));
+  float bar_z = length(max(abs(mod(p.xy, bar_p) - bar_p * 0.5) - bar_w, 0.0));
+
+  float tube_p = 0.1;
+  float tube_w = 0.025;
+  float tube_x = length(mod(p.yz, tube_p) - tube_p * 0.5) - tube_w;
+  float tube_y = length(mod(p.xz, tube_p) - tube_p * 0.5) - tube_w;
+  float tube_z = length(mod(p.xy, tube_p) - tube_p * 0.5) - tube_w;
+
+  return max(max(max(min(min(bar_x, bar_y),bar_z), -tube_x), -tube_y), -tube_z);
+
   //return min(d1, d2);  // 同時に描く
   //return max(d1, d2);  // 重なっている部分だけを描く
   //return max(-d1, d2); // d1が重なっていないd2部分を描く
@@ -64,18 +81,24 @@ void main(void){
   vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
 
   // camera and ray
+  vec3 cPos = vec3(0.0,  0.0,  0.0 + time);
+  vec3 cDir = normalize(vec3(0.1, 0.1, 1.0));
+  vec3 cUp  = normalize(vec3(0.1, 0.4, 0.0));
   vec3 cSide = cross(cDir, cUp);
   float targetDepth = 1.0;
   vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
+
+  vec3 lightDir = normalize(vec3(1, 1, -2));
 
   // marching loop
   float tmp, dist;
   tmp = 0.0;
   vec3 dPos = cPos;
-  for(int i = 0; i < 256; i++){
+  for(int i = 0; i < 64; i++){
     dist = distFunc(dPos);
     tmp += dist;
     dPos = cPos + tmp * ray;
+    if (abs(dist) <= 0.001) break;
   }
 
   // hit check
@@ -83,11 +106,11 @@ void main(void){
   if(abs(dist) < 0.001){
     vec3 normal = genNormal(dPos);
     float diff = clamp(dot(lightDir, normal), 0.1, 1.0);
-    color = vec3(1.0, 1.0, 1.0) * diff;
+    color = vec3(1.0, 0.1, 0.1) * diff;
   }else{
     color = vec3(0.0);
   }
-  gl_FragColor = vec4(color, 1.0);
+  gl_FragColor = vec4(color + 0.05 * tmp, 1.0);
 }
 </script><!-- /fragment shader -->
 
