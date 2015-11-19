@@ -40,14 +40,14 @@ void main(void){
   vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
 
   // direction light
-  vec3 lightDir = normalize(vec3(-1, 2, -1.5));
+  vec3 lightDir = normalize(vec3(-3, 3, -2));
 
   // marching loop
   float dist;
   float depth = 0.0;
   float eps = 0.001;
   vec3 dPos = cPos;
-  for(int i = 0; i < 6; i++){
+  for(int i = 0; i < 32; i++){
     dist = distScene(dPos);
     depth += dist;
     dPos = cPos + depth * ray;
