@@ -7,7 +7,7 @@ uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
 
-float distBox(vec3 p, vec3 b, float r){
+float distBox(vec3 p, vec3 b, float r) {
   return length(max(abs(p) - b, 0.0)) - r;
 }
 float distSphere(vec3 p, vec3 c, float r) {
@@ -15,14 +15,14 @@ float distSphere(vec3 p, vec3 c, float r) {
 }
 
 // distance function
-float distScene(vec3 p){
+float distScene(vec3 p) {
   return max(
     distBox(p, vec3(0.9, 0.45, 0.9), 0.05), 
     distSphere(p, vec3(0.0, 0.45, 0.0), 0.9)
   );
 }
 
-vec3 getNormal(vec3 p){
+vec3 getNormal(vec3 p) {
   float d = 0.0001;
   return normalize(vec3(
     distScene(p + vec3(  d, 0.0, 0.0)) - distScene(p + vec3( -d, 0.0, 0.0)),
@@ -31,7 +31,7 @@ vec3 getNormal(vec3 p){
   ));
 }
 
-void main(void){
+void main(void) {
   // fragment position
   vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
 
