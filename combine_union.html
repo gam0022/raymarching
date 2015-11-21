@@ -37,10 +37,10 @@ void main(void){
 
   // camera and ray
   vec3 cPos = vec3(0.0, 1.6, -2.0);
-  vec3 cDir = normalize(vec3(0.0, -0.9, 1));
-  vec3 cUp  = normalize(vec3(0, 1, 0));
+  vec3 cDir = normalize(vec3(0.0, -0.9, 1.0));
+  vec3 cUp  = cross(cDir, vec3(1.0, 0.0 ,0.0));
   vec3 cSide = cross(cDir, cUp);
-  float targetDepth = 1.0;
+  float targetDepth = 1.3;
   vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
 
   // direction light
@@ -65,7 +65,7 @@ void main(void){
     float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
     color = vec3(1.0, 1.0, 1.0) * diffuse;
   } else {
-    color = vec3(0.0);
+    color = vec3(1.0);
   }
   gl_FragColor = vec4(color, 1.0);
 }
