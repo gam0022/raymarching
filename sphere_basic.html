@@ -17,7 +17,7 @@ float distScene(vec3 p) {
 }
 
 void main(void) {
-  // gl_FragCoord`のxとyの座標を -1.0〜1.0 に正規化する
+  // gl_FragCoord のxy座標の -1.0〜1.0 への正規化
   vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
 
   // カメラとレイの定義

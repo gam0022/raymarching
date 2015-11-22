@@ -8,13 +8,13 @@ uniform vec2 mouse;
 uniform vec2 resolution;
 
 // distance functions
-float distTorus(vec3 p, vec2 t) {
-  vec2 r = vec2(length(p.xy) - t.x, p.z);
-  return length(r) - t.y;
+float distTorus(vec3 p, float a, float b) {
+  vec2 r = vec2(length(p.xy) - a, p.z);
+  return length(r) - b;
 }
 
 float distScene(vec3 p){
-  return distTorus(p, vec2(1.2, 0.4));
+  return distTorus(p, 1.2, 0.4);
 }
 
 vec3 getNormal(vec3 p) {
