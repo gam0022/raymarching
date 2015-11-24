@@ -7,6 +7,8 @@ uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
 
+const float EPS = 0.001;
+
 vec2 onRep(vec2 p, float interval) {
   return mod(p, interval) - interval * 0.5;
 }
@@ -20,7 +22,7 @@ float distTube(vec2 p, float interval, float width) {
 }
 
 // distance function
-float distScene(vec3 p){
+float distScene(vec3 p) {
   float bar_x = distBar(p.yz, 1.0, 0.1);
   float bar_y = distBar(p.xz, 1.0, 0.1);
   float bar_z = distBar(p.xy, 1.0, 0.1);
@@ -59,7 +61,7 @@ vec3 getNormal(vec3 p) {
 //  ));
 //}
 
-void main(void){
+void main(void) {
   // fragment position
   vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
 
@@ -77,25 +79,24 @@ void main(void){
   // marching loop
   float dist;
   float depth = 0.0;
-  float eps = 0.001;
   vec3 dPos = cPos;
   for(int i = 0; i < 64; i++){
     dist = distScene(dPos);
     depth += dist;
     dPos = cPos + depth * ray;
-    if (abs(dist) < eps) break;
+    if (abs(dist) < EPS) break;
   }
 
   // hit check
   vec3 color;
-  if(abs(dist) < eps){
+  if (abs(dist) < EPS) {
     vec3 normal = getNormal(dPos);
     float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
     color = vec3(1.0, 0.1, 0.1) * diffuse;
-  }else{
+  } else {
     color = vec3(0.0);
   }
-  gl_FragColor = vec4(color + 0.07 * depth, 1.0);
+  gl_FragColor = vec4(color + 0.05 * depth, 1.0);
 }
 </script>
 

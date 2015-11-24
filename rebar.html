@@ -7,6 +7,8 @@ uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
 
+const float EPS = 0.001;
+
 vec2 onRep(vec2 p, float interval) {
   return mod(p, interval) - interval * 0.5;
 }
@@ -33,11 +35,10 @@ float distScene(vec3 p) {
 }
 
 vec3 getNormal(vec3 p) {
-  float d = 0.0001;
   return normalize(vec3(
-    distScene(p + vec3(  d, 0.0, 0.0)) - distScene(p + vec3( -d, 0.0, 0.0)),
-    distScene(p + vec3(0.0,   d, 0.0)) - distScene(p + vec3(0.0,  -d, 0.0)),
-    distScene(p + vec3(0.0, 0.0,   d)) - distScene(p + vec3(0.0, 0.0,  -d))
+    distScene(p + vec3(  EPS, 0.0, 0.0)) - distScene(p + vec3( -EPS, 0.0, 0.0)),
+    distScene(p + vec3(0.0,   EPS, 0.0)) - distScene(p + vec3(0.0,  -EPS, 0.0)),
+    distScene(p + vec3(0.0, 0.0,   EPS)) - distScene(p + vec3(0.0, 0.0,  -EPS))
   ));
 }
 
@@ -59,18 +60,17 @@ void main(void) {
   // marching loop
   float dist;
   float depth = 0.0;
-  float eps = 0.001;
   vec3 dPos = cPos;
   for(int i = 0; i < 64; i++){
     dist = distScene(dPos);
     depth += dist;
     dPos = cPos + depth * ray;
-    if (abs(dist) < eps) break;
+    if (abs(dist) < EPS) break;
   }
 
   // hit check
   vec3 color;
-  if(abs(dist) < eps) {
+  if (abs(dist) < EPS) {
     vec3 normal = getNormal(dPos);
     float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
     color = vec3(1.0, 0.1, 0.1) * diffuse;
