@@ -6,6 +6,7 @@ precision highp float;
 uniform float time;
 uniform vec2 resolution;
 
+// 微小な値
 const float EPS = 0.001;
 
 // 距離関数
@@ -27,7 +28,7 @@ vec3 getNormal(vec3 p) {
 }
 
 void main(void) {
-  // gl_FragCoord のxy座標の -1.0〜1.0 への正規化
+  // gl_FragCoord.xy の正規化
   vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
 
   // カメラとレイの定義
@@ -53,10 +54,12 @@ void main(void) {
   vec3 lightDir = normalize(vec3(-3, 5, -2));
   vec3 color;
   if (abs(dist) < EPS) {
+    // 衝突した場合
     vec3 normal = getNormal(dPos);
     float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
     color = vec3(1.0, 1.0, 1.0) * diffuse;
   } else {
+    // 衝突しなかった場合
     color = vec3(1.0);
   }
   gl_FragColor = vec4(color, 1.0);
