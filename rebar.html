@@ -9,6 +9,7 @@ uniform vec2 resolution;
 
 const float EPS = 0.001;
 
+// distance functions
 vec2 onRep(vec2 p, float interval) {
   return mod(p, interval) - interval * 0.5;
 }
@@ -21,7 +22,6 @@ float distTube(vec2 p, float interval, float width) {
   return length(onRep(p, interval)) - width;
 }
 
-// distance function
 float distScene(vec3 p) {
   float bar_x = distBar(p.yz, 1.0, 0.1);
   float bar_y = distBar(p.xz, 1.0, 0.1);
