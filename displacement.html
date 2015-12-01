@@ -21,7 +21,7 @@ vec3 repetition(vec3 p) {
 float displacement(vec3 p) {
   float a = 0.05;
   float b = 10.0;
-  float c = time * 0.005;
+  float c = time * 5.000;
   return a * sin(c + b * p.x) * sin(c + b * p.y) * sin(c + b * p.z);
 }
 

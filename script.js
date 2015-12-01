@@ -28,9 +28,9 @@ function init() {
   document.body.appendChild(canvas);
 }
 
-function render(dt) {
+function render(timestamp) {
   requestAnimationFrame(render);
-  material.uniforms.time.value = dt;
+  material.uniforms.time.value = timestamp * 0.001;
   renderer.render(scene, camera);
 }
 
