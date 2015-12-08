@@ -45,10 +45,20 @@
       );
     }
 
+    float checkeredPattern(vec3 p) {
+      float u = 1.0 - floor(mod(p.x, 2.0));
+      float v = 1.0 - floor(mod(p.z, 2.0));
+      if((u == 1.0 && v < 1.0) || (u < 1.0 && v == 1.0)){
+        return 0.2;
+      } else {
+        return 1.0;
+      }
+    }
+
     vec4 colorScene(vec3 p) {
       return minVec4(
         vec4(1.0, 0.1, 0.1, distSphere(p, vec3(0, 0, 0), 1.0)), 
-        vec4(0.1, 0.1, 1.0, distFloor(p))
+        vec4(vec3(0.5) * checkeredPattern(p), distFloor(p))
       );
     }
     
