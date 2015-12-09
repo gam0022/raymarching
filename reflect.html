@@ -69,6 +69,22 @@
         distScene(p + vec3(0.0, 0.0,   EPS)) - distScene(p + vec3(0.0, 0.0,  -EPS))
       ));
     }
+
+    float getShadow(vec3 ro, vec3 rd){
+      float h = 0.0;
+      float c = 0.0;
+      float r = 1.0;
+      float shadowCoef = 0.5;
+      for(float t = 0.0; t < 50.0; t++){
+        h = distScene(ro + rd * c);
+        if(h < 0.001){
+          return shadowCoef;
+        }
+        r = min(r, h * 16.0 / c);
+        c += h;
+      }
+      return 1.0 - shadowCoef + r * shadowCoef;
+    }
     
     void main(void) {
       // fragment position
@@ -98,14 +114,16 @@
     
       // hit check
       vec3 color;
+      float shadow = 1.0;
       if (abs(dist) < EPS) {
         vec3 normal = getNormal(dPos);
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
         color = colorScene(dPos).rgb * diffuse;
+        shadow = getShadow(dPos + normal * 0.001, lightDir);
       } else {
-        color = vec3(0.0);
+        color = vec3(0.2);
       }
-      gl_FragColor = vec4(color + 0.05 * depth, 1.0);
+      gl_FragColor = vec4(color * max(0.5, shadow) + 0.05 * depth, 1.0);
     }
     </script>
     
