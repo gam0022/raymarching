@@ -1,0 +1,156 @@
+<html>
+  <head><title>Raymarching Sample</title></head>
+  <body>
+<script id="fragment_shader" type="x-shader/x-fragment">
+precision mediump float;
+uniform float time;
+uniform vec2 mouse;
+uniform vec2 resolution;
+
+const vec3 cPos = vec3(-3.0,  3.5,  3.0);
+const vec3 cDir = vec3(0.577, -0.577, -0.577);
+const vec3 cUp  = vec3(0.577, 0.577, -0.577);
+
+const vec3 lightDir = vec3(-0.577, 0.577, 0.577);
+
+vec3 repetition(vec3 p) {
+  float c = 0.4;
+  return mod(p, c) - 0.5 * c;
+}
+
+vec2 sphereToUv(vec3 p, float r) {
+  float q = atan(p.z,p.x);
+  float q2 = asin(p.y / r);
+  float u = q / (2.0 * 3.1415);
+  float v = (1.0 - q2 / (3.1415 / 2.0 )) / 2.0;
+  return vec2(u, v);
+}
+
+float displacement(vec3 p) {
+  float a = 0.05;
+  float b = 10.0;
+  float c = time * 0.005;
+  return a * sin(c + b * p.x) * sin(c + b * p.y) * sin(c + b * p.z);
+}
+
+float noise( vec2 p ) {
+  float h = dot(p, vec2(127.1,311.7));	
+  return 0.0 * fract(sin(h) * 43758.5453123);
+}
+
+// box distance function
+float distFuncBox(vec3 p){
+  float a = mod(0.02 * time, 0.2) + 0.01;
+  return length(max(abs(p) - vec3(a, a, a), 0.0)) - 0.05;
+}
+
+// torus distance function
+float distFuncTorus(vec3 p){
+  vec2 t = vec2(1.5, 0.25);
+  vec2 r = vec2(length(p.xy) - t.x, p.z);
+  return length(r) - t.y;
+}
+
+float distFuncSphere(vec3 p) {
+  return length(p) - 3.0;
+}
+
+// distance function
+float distFunc(vec3 p){
+  float d1 = distFuncSphere(p) + noise(sphereToUv(p, 3.0));
+  return d1;
+  //float d2 = distFuncBox(repetition(p));
+  //return min(d1, d2);  // 同時に描く
+  //return max(d1, d2);  // 重なっている部分だけを描く
+  //return max(-d1, d2); // d1が重なっていないd2部分を描く
+  //return max(d1, -d2); // d2が重なっていないd1部分を描く
+}
+
+vec3 genNormal(vec3 p){
+  float d = 0.0001;
+  return normalize(vec3(
+    distFunc(p + vec3(  d, 0.0, 0.0)) - distFunc(p + vec3( -d, 0.0, 0.0)),
+    distFunc(p + vec3(0.0,   d, 0.0)) - distFunc(p + vec3(0.0,  -d, 0.0)),
+    distFunc(p + vec3(0.0, 0.0,   d)) - distFunc(p + vec3(0.0, 0.0,  -d))
+  ));
+}
+
+void main(void){
+  // fragment position
+  vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+
+  // camera and ray
+  vec3 cSide = cross(cDir, cUp);
+  float targetDepth = 1.0;
+  vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
+
+  // marching loop
+  float tmp, dist;
+  tmp = 0.0;
+  vec3 dPos = cPos;
+  for(int i = 0; i < 256; i++){
+    dist = distFunc(dPos);
+    tmp += dist;
+    dPos = cPos + tmp * ray;
+  }
+
+  // hit check
+  vec3 color;
+  if(abs(dist) < 0.001){
+    vec3 normal = genNormal(dPos);
+    float diff = clamp(dot(lightDir, normal), 0.1, 1.0);
+    color = vec3(1.0, 1.0, 1.0) * diff;
+  }else{
+    color = vec3(0.0);
+  }
+  gl_FragColor = vec4(color, 1.0);
+}
+</script>
+
+<script id="vertex_shader" type="x-shader/x-vertex">
+void main(void) {
+  gl_Position = vec4(position, 1.0);
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+var scene, camera, renderer;
+var geometry, material, mesh;
+
+init();
+animate();
+
+function init() {
+  scene = new THREE.Scene();
+  camera = new THREE.Camera();
+
+  geometry = new THREE.PlaneBufferGeometry(2.0, 2.0);
+  material = new THREE.ShaderMaterial({
+    uniforms: {
+      time: { type: "f" },
+      resolution: { type: "v2" }
+    },
+    vertexShader: document.getElementById('vertex_shader').textContent,
+    fragmentShader: document.getElementById('fragment_shader').textContent
+  });
+  mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(512.0, 512.0);
+
+  document.body.appendChild(renderer.domElement);
+}
+
+function animate(dt) {
+  requestAnimationFrame(animate);
+
+  material.uniforms.time.value = dt;
+  material.uniforms.resolution.value = new THREE.Vector2(512.0, 512.0);
+
+  renderer.render(scene, camera);
+}
+</script>
+</body>
+</html>

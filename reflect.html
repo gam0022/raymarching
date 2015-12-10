@@ -12,6 +12,7 @@
     uniform vec2 resolution;
     
     const float EPS = 0.001;
+    const float PADDING = EPS * 100.0;
     
     // distance functions
     vec2 onRep(vec2 p, float interval) {
@@ -119,7 +120,7 @@
         vec3 normal = getNormal(dPos);
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
         color = colorScene(dPos).rgb * diffuse;
-        shadow = getShadow(dPos + normal * 0.001, lightDir);
+        shadow = getShadow(dPos + normal * PADDING, lightDir);
       } else {
         color = vec3(0.2);
       }
