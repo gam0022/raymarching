@@ -39,13 +39,6 @@
     vec4 minVec4(vec4 a, vec4 b) {
       return (a.a < b.a) ? a : b;
     }
-    
-    float distScene(vec3 p) {
-      return min(
-        distSphere(p, vec3(0, 0, 0), 1.0), 
-        distFloor(p)
-      );
-    }
 
     float checkeredPattern(vec3 p) {
       float u = 1.0 - floor(mod(p.x, 2.0));
@@ -56,10 +49,19 @@
         return 1.0;
       }
     }
+    
+    float distScene(vec3 p) {
+      return min(min(
+        distSphere(p, vec3(0, 0, 0), 1.0), 
+        distSphere(p, vec3(-2, 0, -1), 1.0)),
+        distFloor(p)
+      );
+    }
 
     vec4 colorScene(vec3 p) {
-      return minVec4(
+      return minVec4(minVec4(
         vec4(1.0, 0.1, 0.1, distSphere(p, vec3(0, 0, 0), 1.0)), 
+        vec4(0.1, 0.1, 1.0, distSphere(p, vec3(-2, 0, -1), 1.0))), 
         vec4(vec3(0.5) * checkeredPattern(p), distFloor(p))
       );
     }
@@ -79,7 +81,7 @@
       float shadowCoef = 0.5;
       for(float t = 0.0; t < 50.0; t++){
         h = distScene(ro + rd * c);
-        if(h < 0.001){
+        if(h < EPS){
           return shadowCoef;
         }
         r = min(r, h * 16.0 / c);
@@ -110,7 +112,7 @@
         color = (colorScene(p).rgb * diffuse + vec3(0.8) * specular) * max(0.5, shadow);
         hit = true;
       } else {
-        color = vec3(0.2);
+        color = vec3(0.1);
       }
       return color;// - clamp(0.01 * depth, 0.0, 0.3);
     }
