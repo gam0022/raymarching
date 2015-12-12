@@ -16,18 +16,13 @@
     const vec3 lightDir = normalize(vec3(-3, 5, -2));
     
     // distance functions
-    vec2 onRep(vec2 p, float interval) {
-      return mod(p, interval) - interval * 0.5;
-    }
-
     vec3 onRep(vec3 p, float interval) {
-      vec3 q = mod(p, interval) - interval * 0.5;
-      q.y = p.y;
-      return q;
+      vec2 q = mod(p.xz, interval) - interval * 0.5;
+      return vec3(q.x, p.y, q.y);
     }
     
-    float distSphere(vec3 p, vec3 c, float r) {
-      return length(c - onRep(p, 3.0)) - r;
+    float distSphere(vec3 p, float r) {
+      return length(onRep(p, 3.0)) - r;
     }
 
     float distFloor(vec3 p){
@@ -57,14 +52,14 @@
     
     float distScene(vec3 p) {
       return min(
-        distSphere(p, vec3(0, 0, 0), 1.0), 
+        distSphere(p, 1.0), 
         distFloor(p)
       );
     }
 
     vec4 colorScene(vec3 p) {
       return minVec4(
-        vec4(hsv2rgb(vec3((p.z + p.x) / 10.0, 1.0, 1.0)), distSphere(p, vec3(0, 0, 0), 1.0)), 
+        vec4(hsv2rgb(vec3((p.z + p.x) / 10.0, 1.0, 1.0)), distSphere(p,1.0)), 
         vec4(vec3(0.5) * checkeredPattern(p), distFloor(p))
       );
     }
