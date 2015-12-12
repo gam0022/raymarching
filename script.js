@@ -1,6 +1,6 @@
 var scene, camera, renderer;
 var geometry, material, mesh;
-var mouse = new THREE.Vector2(0, 0);
+var mouse = new THREE.Vector2(0.5, 0.5);
 var canvas;
 
 init();
