@@ -3,6 +3,21 @@
   <head>
     <meta charset="utf-8">
     <title>Reflect</title>
+    <style type="text/css">
+      body {
+        background-color: black;
+        margin: 0;
+        color: white;
+        font-size: 13px;
+      }
+      canvas {
+        display: block;
+        margin: auto;
+      }
+      p {
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
     <script id="fragment_shader" type="x-shader/x-fragment">
@@ -153,8 +168,10 @@
     }
     </script>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js" type="text/javascript"></script>
-    <script src="script.js" type="text/javascript"></script>
-    <div><input type="button" value="save image" onclick="saveImage();"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.min.js"></script>
+    <script src="script_datgui.js" type="text/javascript"></script>
+
+    <p>Reflect - raymarching in realtime on Three.js by <a href="https://twitter.com/gam0022">@gam0022</a>.</p>
   </body>
 </html>
