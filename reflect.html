@@ -13,6 +13,7 @@
     
     const float EPS = 0.001;
     const float PADDING = EPS * 100.0;
+    const vec3 lightDir = normalize(vec3(-3, 5, -2));
     
     // distance functions
     vec2 onRep(vec2 p, float interval) {
@@ -86,6 +87,36 @@
       }
       return 1.0 - shadowCoef + r * shadowCoef;
     }
+
+    vec3 getRayColor(vec3 origin, vec3 ray, int rec) {
+      if(rec == 0) {
+        return vec3(0.0);
+      }
+
+      // marching loop
+      float dist;
+      float depth = 0.0;
+      vec3 dPos = origin;
+      for(int i = 0; i < 64; i++){
+        dist = distScene(dPos);
+        depth += dist;
+        dPos = origin + depth * ray;
+        if (abs(dist) < EPS) break;
+      }
+    
+      // hit check
+      vec3 color;
+      float shadow = 1.0;
+      if (abs(dist) < EPS) {
+        vec3 normal = getNormal(dPos);
+        float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
+        shadow = getShadow(dPos + normal * PADDING, lightDir);
+        color = colorScene(dPos).rgb * diffuse * max(0.5, shadow) + 0.1 * getRayColor(dPos, reflect(ray, normal), rec - 1);
+      } else {
+        color = vec3(0.2);
+      }
+      return color + 0.05 * depth + 0.1;
+    }
     
     void main(void) {
       // fragment position
@@ -98,33 +129,7 @@
       vec3 cSide = cross(cDir, cUp);
       float targetDepth = 1.3;
       vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
-    
-      // direction light
-      vec3 lightDir = normalize(vec3(-3, 5, -2));
-    
-      // marching loop
-      float dist;
-      float depth = 0.0;
-      vec3 dPos = cPos;
-      for(int i = 0; i < 64; i++){
-        dist = distScene(dPos);
-        depth += dist;
-        dPos = cPos + depth * ray;
-        if (abs(dist) < EPS) break;
-      }
-    
-      // hit check
-      vec3 color;
-      float shadow = 1.0;
-      if (abs(dist) < EPS) {
-        vec3 normal = getNormal(dPos);
-        float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
-        color = colorScene(dPos).rgb * diffuse;
-        shadow = getShadow(dPos + normal * PADDING, lightDir);
-      } else {
-        color = vec3(0.2);
-      }
-      gl_FragColor = vec4(color * max(0.5, shadow) + 0.05 * depth, 1.0);
+      gl_FragColor = vec4(getRayColor(cPos, ray, 3), 1.0);
     }
     </script>
     
