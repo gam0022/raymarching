@@ -88,7 +88,7 @@
       return 1.0 - shadowCoef + r * shadowCoef;
     }
 
-    vec3 getRayColor(vec3 origin, vec3 ray, inout vec3 p, inout vec3 normal, inout bool hit) {
+    vec3 getRayColor(vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool hit) {
       // marching loop
       float dist;
       float depth = 0.0;
@@ -102,17 +102,17 @@
     
       // hit check
       vec3 color;
-      float shadow = 1.0;
       if (abs(dist) < EPS) {
         normal = getNormal(p);
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
-        shadow = getShadow(p + normal * PADDING, lightDir);
-        color = colorScene(p).rgb * diffuse * max(0.5, shadow);
+        float specular = pow(clamp(dot(reflect(lightDir, normal), ray), 0.0, 1.0), 10.0);
+        float shadow = getShadow(p + normal * PADDING, lightDir);
+        color = (colorScene(p).rgb * diffuse + vec3(0.8) * specular) * max(0.5, shadow);
         hit = true;
       } else {
         color = vec3(0.2);
       }
-      return color;// + clamp(0.01 * depth, 0.0, 0.5);
+      return color;// - clamp(0.01 * depth, 0.0, 0.3);
     }
     
     void main(void) {
@@ -133,7 +133,7 @@
       float alpha = 1.0;
       for(int i = 0; i < 3; i++) {
         color += alpha * getRayColor(cPos, ray, q, normal, hit);
-        alpha *= 0.5;
+        alpha *= 0.4;
         ray = normalize(reflect(ray, normal));
         cPos = q + normal * PADDING;
 
