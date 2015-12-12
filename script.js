@@ -1,5 +1,6 @@
 var scene, camera, renderer;
 var geometry, material, mesh;
+var mouse = new THREE.Vector2(0, 0);
 var canvas;
 
 init();
@@ -13,7 +14,8 @@ function init() {
   material = new THREE.ShaderMaterial({
     uniforms: {
       time: { type: "f", value: 0.0 },
-      resolution: { type: "v2", value: new THREE.Vector2(512.0, 512.0) }
+      resolution: { type: "v2", value: new THREE.Vector2(512.0, 512.0) },
+      mouse: { type: "v2", value: mouse }
     },
     vertexShader: document.getElementById('vertex_shader').textContent,
     fragmentShader: document.getElementById('fragment_shader').textContent
@@ -25,16 +27,23 @@ function init() {
   renderer.setSize(512.0, 512.0);
 
   canvas = renderer.domElement;
+  canvas.addEventListener('mousemove', onMouseMove, true);
   document.body.appendChild(canvas);
 }
 
 function render(timestamp) {
   requestAnimationFrame(render);
   material.uniforms.time.value = timestamp * 0.001;
+  material.uniforms.mouse.value = mouse;
   renderer.render(scene, camera);
 }
 
 function saveImage() {
   renderer.render(scene, camera);
   window.open(canvas.toDataURL());
+}
+
+function onMouseMove(e) {
+	mouse.x = e.offsetX / canvas.width;
+	mouse.y = e.offsetY / canvas.height;
 }
