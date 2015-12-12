@@ -88,7 +88,7 @@
       return 1.0 - shadowCoef + r * shadowCoef;
     }
 
-    vec3 getRayColor(vec3 origin, vec3 ray, inout vec3 p) {
+    vec3 getRayColor(vec3 origin, vec3 ray, inout vec3 p, inout vec3 normal, inout bool hit) {
       // marching loop
       float dist;
       float depth = 0.0;
@@ -104,14 +104,15 @@
       vec3 color;
       float shadow = 1.0;
       if (abs(dist) < EPS) {
-        vec3 normal = getNormal(p);
+        normal = getNormal(p);
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
         shadow = getShadow(p + normal * PADDING, lightDir);
         color = colorScene(p).rgb * diffuse * max(0.5, shadow);
+        hit = true;
       } else {
         color = vec3(0.2);
       }
-      return color + 0.05 * depth + 0.1;
+      return color;// + clamp(0.01 * depth, 0.0, 0.5);
     }
     
     void main(void) {
@@ -127,11 +128,18 @@
       vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
 
       vec3 color = vec3(0.0);
-      vec3 q;
+      vec3 q, normal;
+      bool hit;
       float alpha = 1.0;
       for(int i = 0; i < 3; i++) {
-        color += alpha * getRayColor(cPos, ray, q);
-        alpha *= 0.1;
+        color += alpha * getRayColor(cPos, ray, q, normal, hit);
+        alpha *= 0.5;
+        ray = normalize(reflect(ray, normal));
+        cPos = q + normal * PADDING;
+
+        if(!hit) {
+          break;
+        }
       }
       gl_FragColor = vec4(color, 1.0);
     }
