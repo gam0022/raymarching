@@ -112,7 +112,7 @@
         color = (colorScene(p).rgb * diffuse + vec3(0.8) * specular) * max(0.5, shadow);
         hit = true;
       } else {
-        color = vec3(0.1);
+        color = vec3(0.0);
       }
       return color - pow(clamp(0.05 * depth, 0.0, 0.6), 2.0);
     }
@@ -135,7 +135,7 @@
       float alpha = 1.0;
       for(int i = 0; i < 3; i++) {
         color += alpha * getRayColor(cPos, ray, q, normal, hit);
-        alpha *= 0.4;
+        alpha *= 0.3;
         ray = normalize(reflect(ray, normal));
         cPos = q + normal * PADDING;
 
