@@ -88,19 +88,15 @@
       return 1.0 - shadowCoef + r * shadowCoef;
     }
 
-    vec3 getRayColor(vec3 origin, vec3 ray, int rec) {
-      if(rec == 0) {
-        return vec3(0.0);
-      }
-
+    vec3 getRayColor(vec3 origin, vec3 ray, inout vec3 p) {
       // marching loop
       float dist;
       float depth = 0.0;
-      vec3 dPos = origin;
+      p = origin;
       for(int i = 0; i < 64; i++){
-        dist = distScene(dPos);
+        dist = distScene(p);
         depth += dist;
-        dPos = origin + depth * ray;
+        p = origin + depth * ray;
         if (abs(dist) < EPS) break;
       }
     
@@ -108,10 +104,10 @@
       vec3 color;
       float shadow = 1.0;
       if (abs(dist) < EPS) {
-        vec3 normal = getNormal(dPos);
+        vec3 normal = getNormal(p);
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
-        shadow = getShadow(dPos + normal * PADDING, lightDir);
-        color = colorScene(dPos).rgb * diffuse * max(0.5, shadow) + 0.1 * getRayColor(dPos, reflect(ray, normal), rec - 1);
+        shadow = getShadow(p + normal * PADDING, lightDir);
+        color = colorScene(p).rgb * diffuse * max(0.5, shadow);
       } else {
         color = vec3(0.2);
       }
@@ -129,7 +125,15 @@
       vec3 cSide = cross(cDir, cUp);
       float targetDepth = 1.3;
       vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
-      gl_FragColor = vec4(getRayColor(cPos, ray, 3), 1.0);
+
+      vec3 color = vec3(0.0);
+      vec3 q;
+      float alpha = 1.0;
+      for(int i = 0; i < 3; i++) {
+        color += alpha * getRayColor(cPos, ray, q);
+        alpha *= 0.1;
+      }
+      gl_FragColor = vec4(color, 1.0);
     }
     </script>
     
