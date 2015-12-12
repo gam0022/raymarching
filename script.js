@@ -27,7 +27,7 @@ function init() {
   renderer.setSize(512.0, 512.0);
 
   canvas = renderer.domElement;
-  canvas.addEventListener('mousemove', onMouseMove, true);
+  canvas.addEventListener('mousemove', onMouseMove);
   document.body.appendChild(canvas);
 }
 
