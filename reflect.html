@@ -53,7 +53,7 @@
     float checkeredPattern(vec3 p) {
       float u = 1.0 - floor(mod(p.x, 2.0));
       float v = 1.0 - floor(mod(p.z, 2.0));
-      if((u == 1.0 && v < 1.0) || (u < 1.0 && v == 1.0)){
+      if ((u == 1.0 && v < 1.0) || (u < 1.0 && v == 1.0)){
         return 0.2;
       } else {
         return 1.0;
@@ -90,12 +90,13 @@
       ));
     }
 
+    // http://wgld.org/d/glsl/g020.html
     float getShadow(vec3 ro, vec3 rd){
       float h = 0.0;
       float c = 0.0;
       float r = 1.0;
       float shadowCoef = 0.5;
-      for(float t = 0.0; t < 50.0; t++){
+      for (float t = 0.0; t < 50.0; t++){
         h = sceneDist(ro + rd * c);
         if(h < EPS){
           return shadowCoef;
@@ -111,7 +112,7 @@
       float dist;
       float depth = 0.0;
       p = origin;
-      for(int i = 0; i < 64; i++){
+      for (int i = 0; i < 64; i++){
         dist = sceneDist(p);
         depth += dist;
         p = origin + depth * ray;
@@ -149,7 +150,7 @@
       vec3 q, normal;
       bool hit;
       float alpha = 1.0;
-      for(int i = 0; i < 3; i++) {
+      for (int i = 0; i < 3; i++) {
         color += alpha * getRayColor(cPos, ray, q, normal, hit);
         alpha *= 0.3;
         ray = normalize(reflect(ray, normal));
