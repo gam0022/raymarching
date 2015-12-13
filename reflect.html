@@ -77,7 +77,7 @@
     vec4 colorScene(vec3 p) {
       return minVec4(
         // 3 * 6 / 2 = 9
-        vec4(hsv2rgb(vec3((p.z + p.x) / 9.0, 1.0, 1.0)), distSphere(p,1.0)), 
+        vec4(hsv2rgb(vec3((p.z + p.x) / 9.0, 1.0, 1.0)), distSphere(p, 1.0)), 
         vec4(vec3(0.5) * checkeredPattern(p), distFloor(p))
       );
     }
