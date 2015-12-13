@@ -9,7 +9,7 @@ var config = {
     window.open(canvas.toDataURL());
   },
   recursion: 3,
-  size: '512',
+  resolution: '512',
 };
 
 init();
@@ -42,7 +42,7 @@ function init() {
 
   var gui = new dat.GUI();
   gui.add(config, 'saveImage').name('Save Image');
-  gui.add(config, 'size', ['256', '512', '800', 'full']).name('Size').onChange(function(value) {
+  gui.add(config, 'resolution', ['256', '512', '800', 'full']).name('Resolution').onChange(function(value) {
     if (value === 'full') {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
