@@ -38,11 +38,11 @@
       return vec3(q.x, p.y, q.y);
     }
     
-    float distSphere(vec3 p, float r) {
+    float sphereDist(vec3 p, float r) {
       return length(onRep(p, 3.0)) - r;
     }
 
-    float distFloor(vec3 p){
+    float floorDist(vec3 p){
       return dot(p, vec3(0.0, 1.0, 0.0)) + 1.0;
     }
 
@@ -67,26 +67,26 @@
       return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
     }
     
-    float distScene(vec3 p) {
+    float sceneDist(vec3 p) {
       return min(
-        distSphere(p, 1.0), 
-        distFloor(p)
+        sphereDist(p, 1.0), 
+        floorDist(p)
       );
     }
 
-    vec4 colorScene(vec3 p) {
+    vec4 sceneColor(vec3 p) {
       return minVec4(
         // 3 * 6 / 2 = 9
-        vec4(hsv2rgb(vec3((p.z + p.x) / 9.0, 1.0, 1.0)), distSphere(p, 1.0)), 
-        vec4(vec3(0.5) * checkeredPattern(p), distFloor(p))
+        vec4(hsv2rgb(vec3((p.z + p.x) / 9.0, 1.0, 1.0)), sphereDist(p, 1.0)), 
+        vec4(vec3(0.5) * checkeredPattern(p), floorDist(p))
       );
     }
     
     vec3 getNormal(vec3 p) {
       return normalize(vec3(
-        distScene(p + vec3(  EPS, 0.0, 0.0)) - distScene(p + vec3( -EPS, 0.0, 0.0)),
-        distScene(p + vec3(0.0,   EPS, 0.0)) - distScene(p + vec3(0.0,  -EPS, 0.0)),
-        distScene(p + vec3(0.0, 0.0,   EPS)) - distScene(p + vec3(0.0, 0.0,  -EPS))
+        sceneDist(p + vec3(  EPS, 0.0, 0.0)) - sceneDist(p + vec3( -EPS, 0.0, 0.0)),
+        sceneDist(p + vec3(0.0,   EPS, 0.0)) - sceneDist(p + vec3(0.0,  -EPS, 0.0)),
+        sceneDist(p + vec3(0.0, 0.0,   EPS)) - sceneDist(p + vec3(0.0, 0.0,  -EPS))
       ));
     }
 
@@ -96,7 +96,7 @@
       float r = 1.0;
       float shadowCoef = 0.5;
       for(float t = 0.0; t < 50.0; t++){
-        h = distScene(ro + rd * c);
+        h = sceneDist(ro + rd * c);
         if(h < EPS){
           return shadowCoef;
         }
@@ -112,20 +112,20 @@
       float depth = 0.0;
       p = origin;
       for(int i = 0; i < 64; i++){
-        dist = distScene(p);
+        dist = sceneDist(p);
         depth += dist;
         p = origin + depth * ray;
         if (abs(dist) < EPS) break;
       }
     
-      // hit check
+      // hit check and calc color
       vec3 color;
       if (abs(dist) < EPS) {
         normal = getNormal(p);
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
         float specular = pow(clamp(dot(reflect(lightDir, normal), ray), 0.0, 1.0), 10.0);
         float shadow = getShadow(p + normal * PADDING, lightDir);
-        color = (colorScene(p).rgb * diffuse + vec3(0.8) * specular) * max(0.5, shadow);
+        color = (sceneColor(p).rgb * diffuse + vec3(0.8) * specular) * max(0.5, shadow);
         hit = true;
       } else {
         color = vec3(0.0);
