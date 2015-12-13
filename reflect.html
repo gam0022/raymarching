@@ -7,16 +7,20 @@
       body {
         background-color: black;
         margin: 0;
-        color: white;
-        font-size: 13px;
+        padding: 0;
       }
       canvas {
-        padding-top: 60px;
         display: block;
-        margin: auto;
+        margin: 0 auto;
       }
       p {
+        color: white;
+        font-size: 13px;
+        position: absolute;
+        top: 10px;
+        width: 100%;
         text-align: center;
+        z-index: 100;
       }
     </style>
   </head>
@@ -24,8 +28,8 @@
     <script id="fragment_shader" type="x-shader/x-fragment">
     precision highp float;
     uniform float time;
-    uniform vec2 mouse;
     uniform vec2 resolution;
+    uniform vec2 mouse;
     
     const float EPS = 0.01;
     const float PADDING = EPS * 100.0;
