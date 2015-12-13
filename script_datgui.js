@@ -43,10 +43,7 @@ function init() {
   var gui = new dat.GUI();
   gui.add(config, 'saveImage').name('Save Image');
   gui.add(config, 'resolution', ['256', '512', '800', 'full']).name('Resolution').onChange(function(value) {
-    if (value === 'full') {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    } else {
+    if (value !== 'full') {
       canvas.width = value;
       canvas.height = value;
     }
@@ -68,5 +65,9 @@ function onMouseMove(e) {
 }
 
 function onWindowResize(e) {
+  if (config.resolution === 'full') {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
   renderer.setSize(canvas.width, canvas.height);
 }
