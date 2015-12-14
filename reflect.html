@@ -32,7 +32,7 @@
     uniform vec2 mouse;
     
     const float EPS = 0.01;
-    const float PADDING = EPS * 100.0;
+    const float OFFSET = EPS * 100.0;
     // normalize(vec3(-3, 5, -2))
     const vec3 lightDir = vec3(-0.48666426339228763, 0.8111071056538127, -0.3244428422615251);
     
@@ -129,7 +129,7 @@
         normal = getNormal(p);
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
         float specular = pow(clamp(dot(reflect(lightDir, normal), ray), 0.0, 1.0), 10.0);
-        float shadow = getShadow(p + normal * PADDING, lightDir);
+        float shadow = getShadow(p + normal * OFFSET, lightDir);
         color = (sceneColor(p).rgb * diffuse + vec3(0.8) * specular) * max(0.5, shadow);
         hit = true;
       } else {
@@ -158,7 +158,7 @@
         color += alpha * getRayColor(cPos, ray, q, normal, hit);
         alpha *= 0.3;
         ray = normalize(reflect(ray, normal));
-        cPos = q + normal * PADDING;
+        cPos = q + normal * OFFSET;
 
         if (!hit) {
           break;
