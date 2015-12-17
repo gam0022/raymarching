@@ -103,7 +103,7 @@
     // http://wgld.org/d/glsl/g020.html
     float getShadow(vec3 ro, vec3 rd){
       float h = 0.0;
-      float c = 0.0;
+      float c = EPS;
       float r = 1.0;
       float shadowCoef = 0.5;
       for (int t = 0; t < 50; t++){
