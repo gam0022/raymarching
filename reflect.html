@@ -106,7 +106,7 @@
       float c = 0.0;
       float r = 1.0;
       float shadowCoef = 0.5;
-      for (float t = 0.0; t < 50.0; t++){
+      for (int t = 0; t < 50; t++){
         h = sceneDist(ro + rd * c);
         if(h < EPS){
           return shadowCoef;
@@ -136,7 +136,7 @@
         float diffuse = clamp(dot(lightDir, normal), 0.1, 1.0);
         float specular = pow(clamp(dot(reflect(lightDir, normal), ray), 0.0, 1.0), 10.0);
         float shadow = getShadow(p + normal * OFFSET, lightDir);
-        color = (sceneColor(p).rgb * diffuse + vec3(0.8) * specular) * max(0.5, shadow);
+        color = (sceneColor(p).rgb * diffuse + vec3(0.8) * specular) * clamp(shadow, 0.5, 1.0);
         hit = true;
       } else {
         color = vec3(0.0);
