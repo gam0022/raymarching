@@ -1,6 +1,7 @@
 var scene, camera, renderer;
 var geometry, material, mesh;
 var mouse = new THREE.Vector2(0.5, 0.5);
+var touchEnable;
 var canvas;
 
 var config = {
@@ -36,7 +37,9 @@ function init() {
   renderer.setSize(512.0, 512.0);
 
   canvas = renderer.domElement;
+  touchEnable = ('ontouchstart' in window);
   canvas.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('touchmove', onMouseMove);
   window.addEventListener('resize', onWindowResize);
   document.body.appendChild(canvas);
 
@@ -60,8 +63,13 @@ function render(timestamp) {
 }
 
 function onMouseMove(e) {
-	mouse.x = e.offsetX / canvas.width;
-	mouse.y = e.offsetY / canvas.height;
+  if (touchEnable) {
+    mouse.x = e.changedTouches[0].pageX / canvas.width;
+    mouse.y = e.changedTouches[0].pageY / canvas.height;
+  } else {
+    mouse.x = e.offsetX / canvas.width;
+    mouse.y = e.offsetY / canvas.height;
+  }
 }
 
 function onWindowResize(e) {
