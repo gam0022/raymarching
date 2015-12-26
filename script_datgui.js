@@ -2,6 +2,7 @@ var scene, camera, renderer;
 var geometry, material, mesh;
 var mouse = new THREE.Vector2(0.5, 0.5);
 var canvas;
+var stats;
 
 var config = {
   saveImage: function() {
@@ -49,14 +50,21 @@ function init() {
     }
     onWindowResize();
   });
+
+  stats = new Stats();
+  document.body.appendChild( stats.domElement );
 }
 
 function render(timestamp) {
-  requestAnimationFrame(render);
+  stats.begin();
+
   material.uniforms.time.value = timestamp * 0.001;
   material.uniforms.resolution.value = new THREE.Vector2(canvas.width, canvas.height);
   material.uniforms.mouse.value = mouse;
   renderer.render(scene, camera);
+
+  stats.end();
+  requestAnimationFrame(render);
 }
 
 function onMouseMove(e) {
