@@ -1,9 +1,4 @@
 <!DOCTYPE html>
-<!--
-Copyright (c) 2015 gam0022
-Released under the MIT license
-http://opensource.org/licenses/mit-license.php
--->
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
@@ -55,7 +50,8 @@ http://opensource.org/licenses/mit-license.php
 			uniform vec3 cameraDir;
 
 			const float EPS = 0.01;
-			const float OFFSET = EPS * 100.0;
+			const float OFFSET = EPS * 1000.0;
+			const float PI = 3.14159265;
 			const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
 
 			// distance functions
@@ -66,9 +62,21 @@ http://opensource.org/licenses/mit-license.php
 
 			}
 
+			// http://tokyodemofest.jp/2015/pages/common/glslsemi/index.html
+			float perlin( vec3 p ) {
+
+				vec3 i = floor( p );
+				vec4 a = dot( i, vec3( 1., 57., 21. ) ) + vec4( 0., 57., 21., 78. );
+				vec3 f = cos( ( p - i ) * PI ) * ( -.5 ) + .5;
+				a = mix( sin ( cos ( a ) * a ), sin( cos ( 1. + a ) * ( 1. + a ) ), f.x );
+				a.xy = mix( a.xz, a.yw, f.y );
+				return mix( a.x, a.y, f.z );
+
+			}
+
 			float sphereDist( vec3 p, float r ) {
 
-				return length( onRep( p, 3.0 ) ) - r;
+				return length( p - vec3( 0.0, 1.0, 0.0 ) ) - r;
 
 			}
 
@@ -122,7 +130,7 @@ http://opensource.org/licenses/mit-license.php
 
 				return minVec4(
 					// 3 * 6 / 2 = 9
-					vec4( hsv2rgb(vec3( ( p.z + p.x ) / 9.0, 1.0, 1.0 ) ), sphereDist( p, 1.0 ) ),
+					vec4( vec3( 0.1, 0.0, 0.0 ), sphereDist( p, 1.0 ) ),
 					vec4( vec3( 0.5 ) * checkeredPattern( p ), floorDist( p ) )
 				);
 
@@ -167,20 +175,20 @@ http://opensource.org/licenses/mit-license.php
 				float depth = 0.0;
 				p = origin;
 
-				for ( int i = 0; i < 64; i++ ){
+				for ( int i = 0; i < 128; i++ ){
 
-					dist = sceneDist( p );
+					dist = abs( sceneDist( p ) );
 					depth += dist;
 					p = origin + depth * ray;
 
-					if ( abs(dist) < EPS ) break;
+					if ( dist < EPS ) break;
 
 				}
 
 				// hit check and calc color
 				vec3 color;
 
-				if ( abs(dist) < EPS ) {
+				if ( dist < EPS ) {
 
 					normal = getNormal(p);
 					float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
@@ -196,7 +204,7 @@ http://opensource.org/licenses/mit-license.php
 
 				}
 
-				return color - pow( clamp( 0.05 * depth, 0.0, 0.6 ), 2.0 );
+				return color;
 
 			}
 
@@ -218,12 +226,12 @@ http://opensource.org/licenses/mit-license.php
 				bool hit;
 				float alpha = 1.0;
 
-				for ( int i = 0; i < 3; i++ ) {
+				for ( int i = 0; i < 10; i++ ) {
 
 					color += alpha * getRayColor( cPos, ray, q, normal, hit );
-					alpha *= 0.3;
-					ray = normalize( reflect( ray, normal ) );
-					cPos = q + normal * OFFSET;
+					alpha *= 0.9;
+					ray = normalize( refract( ray, normal, 0.67 ) );
+					cPos = q + ray * OFFSET;
 
 					if ( !hit ) break;
 
@@ -345,7 +353,7 @@ http://opensource.org/licenses/mit-license.php
 
 				} else {
 
-					camera.position.set( mouse.x - 0.5, mouse.y * 4, timestamp * 0.001 );
+					camera.position.set( mouse.x - 0.5, mouse.y * 4, -3 );
 					camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ).add( camera.position ) );
 
 				}
