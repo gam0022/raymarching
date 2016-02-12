@@ -50,7 +50,7 @@
 			uniform vec3 cameraDir;
 
 			const float EPS = 0.01;
-			const float OFFSET = EPS * 1000.0;
+			const float OFFSET = EPS * 100.0;
 			const float PI = 3.14159265;
 			const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
 
@@ -82,7 +82,7 @@
 
 			float floorDist( vec3 p ){
 
-				return dot(p, vec3( 0.0, 1.0, 0.0 ) ) + 1.0;
+				return dot(p, vec3( 0.0, 1.0, 0.0 ) ) + 0.0;
 
 			}
 
@@ -130,7 +130,7 @@
 
 				return minVec4(
 					// 3 * 6 / 2 = 9
-					vec4( vec3( 0.1, 0.0, 0.0 ), sphereDist( p, 1.0 ) ),
+					vec4( vec3( 0.01, 0.0, 0.0 ), sphereDist( p, 1.0 ) ),
 					vec4( vec3( 0.5 ) * checkeredPattern( p ), floorDist( p ) )
 				);
 
@@ -226,12 +226,12 @@
 				bool hit;
 				float alpha = 1.0;
 
-				for ( int i = 0; i < 10; i++ ) {
+				for ( int i = 0; i < 3; i++ ) {
 
 					color += alpha * getRayColor( cPos, ray, q, normal, hit );
-					alpha *= 0.9;
-					ray = normalize( refract( ray, normal, 0.67 ) );
+					alpha *= 0.99;
 					cPos = q + ray * OFFSET;
+					ray = normalize( refract( ray, normal, 1.2 ) );
 
 					if ( !hit ) break;
 
