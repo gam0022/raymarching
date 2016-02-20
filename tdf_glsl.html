@@ -189,11 +189,11 @@ vec4 sceneColor( vec3 p ) {
 	vec2 uv = p.xz;
 	vec2 dg = circuit(uv);
 
-	float glow = max( ( mod( length( p ) - time * 1.5, 10.0 ) - 8.0 ) * 2.5, 0.0 );
-	if( dg.x < 1.2 ) glow = 0.0;
+	float glow = max( sin( length(p) - 1.8 * time ) * 2.5, 0.0 );
+	if( dg.x < 1.1 ) glow = 0.0;
 
 	return minVec4(
-		vec4( 0.05 * lColor, sphereDist( p, sPos, 0.02 ) ),
+		vec4( 0.5 - 0.5 * cos( time * 0.2 ) * lColor, sphereDist( p, sPos, 0.02 ) ),
 		vec4( vec3( 0.2, 0.2, 0.2 ) + lColor * glow, MBoxDf( onRep( p, 7.0 ) ) )
 	);
 
@@ -287,7 +287,7 @@ void main(void) {
 	// camera and ray
 	if ( true ) {
 		cPos  = vec3( -0.8185093402862549, 4.509979248046875, time );
-		cDir  = normalize( vec3( sin( time * 0.5 ), sin( time * 0.1 ), cos( time ) + 0.5 ) );
+		cDir  = normalize( vec3( sin( time * 0.5 ), sin( time * 0.1 ), cos( time * 0.6 ) + 0.5 ) );
 	} else {
 		cPos  = cameraPos;
 		cDir  = cameraDir;
