@@ -90,8 +90,7 @@ float MBoxDf (vec3 p)
 // distance functions
 vec3 onRep( vec3 p, float interval ) {
 
-	vec2 q = mod( p.xz, interval ) - interval * 0.5;
-	return vec3( q.x, p.y, q.y );
+	return mod( p, interval ) - 0.5 * interval;
 
 }
 
@@ -141,7 +140,8 @@ vec3 hsv2rgb( vec3 c ) {
 float sceneDist( vec3 p ) {
 
 	//return ObjDf( p );
-	return MBoxDf( p );
+	return MBoxDf( onRep( p, 7.0 ) );
+	//return MBoxDf( p );
 
 	//return min(
 	//	sphereDist( p, 1.0 ),
@@ -152,7 +152,7 @@ float sceneDist( vec3 p ) {
 
 vec4 sceneColor( vec3 p ) {
 
-	return vec4( 0.5, 0.8, 0.5, sceneDist(p) );
+	return vec4( 0.5, 0.5, 0.8, sceneDist(p) );
 	//return minVec4(
 	//	// 3 * 6 / 2 = 9
 	//	vec4( hsv2rgb(vec3( ( p.z + p.x ) / 9.0, 1.0, 1.0 ) ), sphereDist( p, 1.0 ) ),
@@ -240,8 +240,8 @@ void main(void) {
 
 	// camera and ray
 	vec3 cPos, cDir;
-	if(true) {
-		cPos  = vec3( 2.6314728260040283, 1.0912302732467651, -5.0 + time );
+	if ( true ) {
+		cPos  = vec3( -0.8185093402862549, 4.509979248046875, time );
 		cDir  = normalize( vec3( 0.0, 0.0, 1.0 ) );
 	} else {
 		cPos  = cameraPos;
