@@ -314,7 +314,7 @@ void main(void) {
 	for ( int i = 0; i < 3; i++ ) {
 
 		color += alpha * getRayColor( cPos, ray, q, normal, hit );
-		alpha *= 0.3;
+		alpha *= 0.5;
 		ray = normalize( reflect( ray, normal ) );
 		cPos = q + normal * OFFSET;
 
