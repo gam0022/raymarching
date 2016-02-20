@@ -66,6 +66,7 @@ const float OFFSET = EPS * 100.0;
 const float PI = 3.14159;
 
 vec3 cPos, cDir, sPos;
+vec3 lColor;
 
 const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
 
@@ -194,8 +195,8 @@ vec4 sceneColor( vec3 p ) {
 	if( dg.x < 1.2 ) glow = 0.0;
 
 	return minVec4(
-		vec4( vec3(0.0), sphereDist( p, sPos, 0.02 ) ),
-		vec4( vec3( 0.2, 0.2, 0.2 ) + vec3( 0.2, 0.2, 1.0 ) * glow, MBoxDf( onRep( p, 7.0 ) ) )
+		vec4( 0.05 * lColor, sphereDist( p, sPos, 0.02 ) ),
+		vec4( vec3( 0.2, 0.2, 0.2 ) + lColor * glow, MBoxDf( onRep( p, 7.0 ) ) )
 	);
 
 	//return minVec4(
@@ -266,13 +267,13 @@ vec3 getRayColor( vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool h
 		float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
 		float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 );
 		float shadow = 0.0;//getShadow( p + normal * OFFSET, lightDir );
-		color = ( sceneColor( p ).rgb * diffuse + vec3( 0.8 ) * specular ) * max( 0.5, shadow );
+		color = ( sceneColor( p ).rgb * diffuse + specular ) * max( 0.5, shadow );
 
 		hit = true;
 
 	} else {
 
-		color = vec3( 0.0 );
+		color = vec3(0.1);
 
 	}
 
@@ -288,7 +289,7 @@ void main(void) {
 	// camera and ray
 	if ( true ) {
 		cPos  = vec3( -0.8185093402862549, 4.509979248046875, time );
-		cDir  = normalize( vec3( sin(time * 0.5 ), 0.5, 1.0 ) );
+		cDir  = normalize( vec3( sin( time * 0.5 ), sin( time * 0.1 ), cos( time ) ) );
 	} else {
 		cPos  = cameraPos;
 		cDir  = cameraDir;
@@ -301,6 +302,9 @@ void main(void) {
 	// sphere pos
 	float d = 0.2 + 0.1 * cos( time * 0.5 );
 	sPos = cPos + vec3( 0.0, 0.0, d );
+
+	// light Color
+	lColor = hsv2rgb( vec3( time * 0.02, 1.0, 1.0 ) );
 
 	vec3 color = vec3( 0.0 );
 	vec3 q, normal;
