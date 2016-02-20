@@ -63,30 +63,15 @@ uniform vec3 cameraDir;
 
 const float EPS = 0.01;
 const float OFFSET = EPS * 100.0;
+const float PI = 3.14159;
+
 const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
-
-// Quote
-
-const float pi = 3.14159;
-const vec4 cHashA4 = vec4 (0., 1., 57., 58.);
-const vec3 cHashA3 = vec3 (1., 57., 113.);
-const float cHashM = 43758.54;
 
 float PrBox2Df (vec2 p, vec2 b)
 {
   vec2 d = abs (p) - b;
   return min (max (d.x, d.y), 0.) + length (max (d, 0.));
 }
-
-float PrCylAnDf (vec3 p, float r, float w, float h)
-{
-  return max (abs (length (p.xy) - r) - w, abs (p.z) - h);
-}
-
-mat3 vuMat;
-vec3 vuPos;
-float tCur, dstFar, chRingO, chRingI, vuVel, bxSize, chSize, qnStep;
-int idObj;
 
 float MBoxDf (vec3 p)
 {
@@ -101,25 +86,6 @@ float MBoxDf (vec3 p)
   }
   return length (q.xyz) / abs (q.w);
 }
-
-float ObjDf (vec3 p)
-{
-  vec3 q;
-  float dMin, d, dm, tWid;
-  dMin = dstFar;
-  d = MBoxDf (p);
-  q = p;
-  q.y -= vuPos.y;
-  tWid = 0.7 * chSize;
-  dm = min (PrCylAnDf (q.xzy, chRingO, chSize, chSize),
-     PrCylAnDf (q.xzy, chRingI, tWid, chSize));
-  dm = min (min (dm, PrBox2Df (q.xy, vec2 (tWid, chSize))),
-     PrBox2Df (q.zy, vec2 (tWid, chSize)));
-  d = max (d, - dm);
-  if (d < dMin) { dMin = d;  idObj = 1; }
-  return dMin;
-}
-
 
 // distance functions
 vec3 onRep( vec3 p, float interval ) {
