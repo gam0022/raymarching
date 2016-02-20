@@ -76,7 +76,7 @@ float PrBox2Df (vec2 p, vec2 b)
 float MBoxDf (vec3 p)
 {
   vec4 q, q0;
-  const float mScale = 2.62;
+  const float mScale = 2.7;
   const int nIter = 12;
   q0 = vec4 (p, 1.);
   q = q0;
@@ -242,7 +242,7 @@ void main(void) {
 	vec3 cPos, cDir;
 	if ( true ) {
 		cPos  = vec3( -0.8185093402862549, 4.509979248046875, time );
-		cDir  = normalize( vec3( 0.0, 0.0, 1.0 ) );
+		cDir  = normalize( vec3( sin(time / 2.0 ), 0.5, 1.0 ) );
 	} else {
 		cPos  = cameraPos;
 		cDir  = cameraDir;
