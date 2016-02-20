@@ -240,8 +240,8 @@ vec3 getRayColor( vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool h
 		normal = getNormal(p);
 		float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
 		float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 );
-		float shadow = 0.0;//getShadow( p + normal * OFFSET, lightDir );
-		color = ( sceneColor( p ).rgb * diffuse + specular ) * max( 0.5, shadow );
+		//float shadow = getShadow( p + normal * OFFSET, lightDir );
+		color = ( sceneColor( p ).rgb * diffuse + specular )/* * max( 0.5, shadow )*/;
 
 		hit = true;
 
