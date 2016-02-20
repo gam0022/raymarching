@@ -289,7 +289,7 @@ void main(void) {
 	// camera and ray
 	if ( true ) {
 		cPos  = vec3( -0.8185093402862549, 4.509979248046875, time );
-		cDir  = normalize( vec3( sin( time * 0.5 ), sin( time * 0.1 ), cos( time ) ) );
+		cDir  = normalize( vec3( sin( time * 0.5 ), sin( time * 0.1 ), cos( time ) + 0.5 ) );
 	} else {
 		cPos  = cameraPos;
 		cDir  = cameraDir;
