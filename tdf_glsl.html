@@ -48,11 +48,9 @@ http://opensource.org/licenses/mit-license.php
 
 		<script id="fragment_shader" type="x-shader/x-fragment">
 
-//#ifdef GL_ES
-//precision mediump float;
-//#endif
-
-precision highp float;
+#ifdef GL_ES
+precision mediump float;
+#endif
 
 uniform float time;
 uniform vec2 mouse;
