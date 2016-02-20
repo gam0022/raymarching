@@ -68,27 +68,27 @@ vec3 lColor;
 
 const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
 
-float PrBox2Df (vec2 p, vec2 b)
-{
-  vec2 d = abs (p) - b;
-  return min (max (d.x, d.y), 0.) + length (max (d, 0.));
+// distance functions
+float PrBox2Df (vec2 p, vec2 b) {
+
+  vec2 d = abs( p ) - b;
+  return min( max( d.x, d.y ), 0.0 ) + length( max( d, 0.0 ) );
+
 }
 
-float MBoxDf (vec3 p)
-{
+float MBoxDf (vec3 p) {
   vec4 q, q0;
   const float mScale = 2.7;
   const int nIter = 12;
   q0 = vec4 (p, 1.);
   q = q0;
-  for (int n = 0; n < nIter; n ++) {
-    q.xyz = clamp (q.xyz, -1., 1.) * 2. - q.xyz;
-    q = q * mScale / clamp (dot (q.xyz, q.xyz), 0.5, 1.) + q0;
+  for ( int n = 0; n < nIter; n++ ) {
+    q.xyz = clamp( q.xyz, -1.0, 1.0 ) * 2.0 - q.xyz;
+    q = q * mScale / clamp( dot( q.xyz, q.xyz ), 0.5, 1.0 ) + q0;
   }
-  return length (q.xyz) / abs (q.w);
+  return length( q.xyz ) / abs( q.w );
 }
 
-// distance functions
 vec3 onRep( vec3 p, float interval ) {
 
 	return mod( p, interval ) - 0.5 * interval;
@@ -101,32 +101,9 @@ float sphereDist( vec3 p, vec3 c, float r ) {
 
 }
 
-float floorDist( vec3 p ){
-
-	return dot(p, vec3( 0.0, 1.0, 0.0 ) ) + 1.0;
-
-}
-
 vec4 minVec4( vec4 a, vec4 b ) {
 
 	return ( a.a < b.a ) ? a : b;
-
-}
-
-float checkeredPattern( vec3 p ) {
-
-	float u = 1.0 - floor( mod( p.x, 2.0 ) );
-	float v = 1.0 - floor( mod( p.z, 2.0 ) );
-
-	if ( ( u == 1.0 && v < 1.0 ) || ( u < 1.0 && v == 1.0 ) ) {
-
-		return 0.2;
-
-	} else {
-
-		return 1.0;
-
-	}
 
 }
 
@@ -147,7 +124,8 @@ float sceneDist( vec3 p ) {
 
 }
 
-vec2 circuit(vec2 p) {
+vec2 circuit( vec2 p ) {
+
 	p = fract(p);
 	float r = 0.123;
 	float v = 0.0, g = 0.0;
@@ -182,6 +160,7 @@ vec2 circuit(vec2 p) {
 	}
 	v /= float(iter);
 	return vec2(g, v);
+
 }
 
 vec4 sceneColor( vec3 p ) {
@@ -196,12 +175,6 @@ vec4 sceneColor( vec3 p ) {
 		vec4( 0.5 - 0.5 * cos( time * 0.2 ) * lColor, sphereDist( p, sPos, 0.02 ) ),
 		vec4( vec3( 0.2, 0.2, 0.2 ) + lColor * glow, MBoxDf( onRep( p, 7.0 ) ) )
 	);
-
-	//return minVec4(
-	//	// 3 * 6 / 2 = 9
-	//	vec4( hsv2rgb(vec3( ( p.z + p.x ) / 9.0, 1.0, 1.0 ) ), sphereDist( p, 1.0 ) ),
-	//	vec4( vec3( 0.5 ) * checkeredPattern( p ), floorDist( p ) )
-	//);
 
 }
 
@@ -302,7 +275,7 @@ void main(void) {
 	sPos = cPos + vec3( 0.0, 0.0, d );
 
 	// light Color
-	lColor = hsv2rgb( vec3( time * 0.02, 1.0, 1.0 ) );
+	lColor = hsv2rgb( vec3( time * 0.02 + 0.6, 1.0, 1.0 ) );
 
 	vec3 color = vec3( 0.0 );
 	vec3 q, normal;
