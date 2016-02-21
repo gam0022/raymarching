@@ -430,14 +430,16 @@ void main(void) {
 				//flyControls.movementSpeed = 0.1;
 
 				orbitControls = new THREE.OrbitControls( camera, canvas );
+				orbitControls.enablePan = true;
+				orbitControls.keyPanSpeed = 0.01;
 				orbitControls.enableDamping = false;
 				orbitControls.dampingFactor = 0.015;
 				orbitControls.enableZoom = true;
-				orbitControls.zoomSpeed = 0.1;
+				orbitControls.zoomSpeed = 0.001;
 				orbitControls.rotateSpeed = 0.8;
 				orbitControls.autoRotate = false;
 				orbitControls.autoRotateSpeed = 0.0;
-				orbitControls.target = new THREE.Vector3( 0.0, 0.0, 2.0 );
+				orbitControls.target = new THREE.Vector3( 0.0, 0.0, 0.0 );
 
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
