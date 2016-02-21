@@ -132,7 +132,7 @@ vec3 hsv2rgb( vec3 c ) {
 
 }
 
-vec2 circuit( vec2 p ) {
+vec2 circuitPattern( vec2 p ) {
 
 	p = fract(p);
 	float r = 0.123;
@@ -173,8 +173,8 @@ vec2 circuit( vec2 p ) {
 
 vec4 sceneColor( vec3 p ) {
 
-	vec2 uv = p.xz;
-	vec2 dg = circuit(uv);
+	vec2 uv = p.yz;
+	vec2 dg = circuitPattern(uv);
 
 	float glow = max( sin( length(p) - 1.8 * time ) * 2.5, 0.0 );
 	if( dg.x < 1.1 ) glow = 0.0;
