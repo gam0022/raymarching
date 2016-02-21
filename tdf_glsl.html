@@ -76,6 +76,8 @@ vec3 illuminationColor;
 float tempo;
 
 struct Intersect {
+	bool isHit;
+
 	vec3 position;
 	float distance;
 	vec3 normal;
@@ -84,7 +86,7 @@ struct Intersect {
 	vec3 color;
 };
 
-const int PHONG_MATERIAL = 0;
+const int CIRCUIT_MATERIAL = 0;
 const int MIRROR_MATERIAL = 1;
 
 
@@ -92,12 +94,6 @@ const int MIRROR_MATERIAL = 1;
 vec3 onRep( vec3 p, float interval ) {
 
 	return mod( p, interval ) - 0.5 * interval;
-
-}
-
-vec4 minVec4( vec4 a, vec4 b ) {
-
-	return ( a.a < b.a ) ? a : b;
 
 }
 
@@ -183,19 +179,27 @@ vec2 circuitPattern( vec2 p ) {
 
 }
 
-vec4 sceneColor( vec3 p ) {
 
-	vec2 uv = p.yz;
-	vec2 dg = circuitPattern(uv);
+Intersect minIntersect( Intersect a, Intersect b ) {
 
-	float glow = max( sin( length(p) - 1.8 * time ) * 2.5, 0.0 );
-	if( dg.x < 1.1 ) glow = 0.0;
+	if ( a.distance < b.distance ) {
+		return a;
+	} else {
+		return b;
+	}
 
-	return minVec4(
-		vec4( 0.5 - 0.5 * cos( time * 0.2 ) * illuminationColor, sphereDist( p, sPos, sSize ) ),
-		vec4( vec3( 0.2, 0.2, 0.2 ) + illuminationColor * glow, MBoxDist( onRep( p, 7.0 ) ) )
-	);
+}
 
+Intersect sceneIntersect( vec3 p ) {
+
+	Intersect a, b;
+	a.distance = sphereDist( p, sPos, sSize );
+	a.material = MIRROR_MATERIAL;
+
+	b.distance = MBoxDist( onRep( p, 7.0 ) );
+	b.material = CIRCUIT_MATERIAL;
+
+	return minIntersect( a, b );
 }
 
 vec3 getNormal( vec3 p ) {
@@ -230,13 +234,14 @@ float getShadow( vec3 ro, vec3 rd ) {
 
 }
 
-vec3 getRayColor( vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool hit ) {
+Intersect getRayColor( vec3 origin, vec3 ray ) {
 
 	// marching loop
 	float dist;
 	float depth = 0.0;
-	p = origin;
+	vec3 p = origin;
 	int count = 0;
+	Intersect nearest;
 
 	for ( int i = 0; i < 64; i++ ){
 
@@ -249,26 +254,42 @@ vec3 getRayColor( vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool h
 
 	}
 
-	// hit check and calc color
-	vec3 color;
-
 	if ( abs(dist) < EPS ) {
 
-		normal = getNormal(p);
-		float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
-		float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 );
-		//float shadow = getShadow( p + normal * OFFSET, lightDir );
-		color = ( sceneColor( p ).rgb * diffuse + specular )/* * max( 0.5, shadow )*/;
+		nearest = sceneIntersect( p );
+		nearest.position = p;
+		nearest.normal = getNormal(p);
+		float diffuse = clamp( dot( lightDir, nearest.normal ), 0.1, 1.0 );
+		float specular = pow( clamp( dot( reflect( lightDir, nearest.normal ), ray ), 0.0, 1.0 ), 10.0 );
+		//float shadow = getShadow( p + nearest.normal * OFFSET, lightDir );
 
-		hit = true;
+		if ( nearest.material == CIRCUIT_MATERIAL ) {
+
+			vec2 uv = p.yz;
+			vec2 dg = circuitPattern(uv);
+
+			float glow = max( sin( length( p ) - 1.8 * time ) * 2.5, 0.0 );
+			if( dg.x < 1.1 ) glow = 0.0;
+
+			nearest.color = vec3( 0.2, 0.2, 0.2 ) + illuminationColor * glow * diffuse + specular /* * max( 0.5, shadow )*/;
+
+		} else if ( nearest.material == MIRROR_MATERIAL ) {
+
+			nearest.color = ( 0.5 - 0.5 * cos( time * 0.2 ) * illuminationColor * diffuse + specular )/* * max( 0.5, shadow )*/;
+
+		}
+
+		nearest.isHit = true;
 
 	} else {
 
-		color = vec3(0.1);
+		nearest.color = vec3(0.1);
+		nearest.isHit = false;
 
 	}
 
-	return color + clamp( sin( time * 0.2 - 0.5 * PI ) * 0.2 * depth - 0.005 * float(count), -1.0, 1.0 );
+	nearest.color += clamp( sin( time * 0.2 - 0.5 * PI ) * 0.2 * depth - 0.005 * float(count), -1.0, 1.0 );
+	return nearest;
 
 }
 
@@ -302,18 +323,19 @@ void main(void) {
 	illuminationColor = hsv2rgb( vec3( time * 0.02 + 0.6, 1.0, 1.0 ) );
 
 	vec3 color = vec3( 0.0 );
-	vec3 q, normal;
-	bool hit;
 	float alpha = 1.0;
+	Intersect nearest;
 
 	for ( int i = 0; i < 3; i++ ) {
 
-		color += alpha * getRayColor( cPos, ray, q, normal, hit );
-		alpha *= 0.5;
-		ray = normalize( reflect( ray, normal ) );
-		cPos = q + normal * OFFSET;
+		nearest = getRayColor( cPos, ray );
 
-		if ( !hit ) break;
+		color += alpha * nearest.color;
+		alpha *= 0.5;
+		ray = normalize( reflect( ray, nearest.normal ) );
+		cPos = nearest.position + nearest.normal * OFFSET;
+
+		if ( !nearest.isHit || nearest.material == CIRCUIT_MATERIAL ) break;
 
 	}
 
