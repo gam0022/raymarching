@@ -75,6 +75,18 @@ float sSize;
 vec3 illuminationColor;
 float tempo;
 
+struct Intersect {
+	vec3 position;
+	float distance;
+	vec3 normal;
+
+	int material;
+	vec3 color;
+};
+
+const int PHONG_MATERIAL = 0;
+const int MIRROR_MATERIAL = 1;
+
 
 // distance functions
 vec3 onRep( vec3 p, float interval ) {
