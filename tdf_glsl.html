@@ -331,7 +331,7 @@ void main(void) {
 		nearest = getRayColor( cPos, ray );
 
 		color += alpha * nearest.color;
-		alpha *= 0.5;
+		alpha *= 0.99;
 		ray = normalize( reflect( ray, nearest.normal ) );
 		cPos = nearest.position + nearest.normal * OFFSET;
 
