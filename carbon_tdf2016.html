@@ -160,14 +160,14 @@ vec2 circuitPattern( vec2 p ) {
 	d = p.y - 1.0;
 	g += pow(clamp(1.0 - abs(d), 0.0, 1.0), 10000.0);
 	
-	const int iter = 12;
+	const int iter = 18;
 	for(int i = 0; i < iter; i ++)
 	{
 		cp = 0.5 + (r - 0.5) * 0.9;
 		d = p.x - cp;
 		g += pow(clamp(1.0 - abs(d), 0.0, 1.0), 200.0);
 		if(d > 0.0) {
-			r = fract(r * 4829.013);
+			r = fract(r * 4829.013 * 2.0);
 			p.x = (p.x - cp) / (1.0 - cp);
 			v += 1.0;
 		}
@@ -268,7 +268,7 @@ Intersect getRayColor( vec3 origin, vec3 ray ) {
 
 		if ( nearest.material == CIRCUIT_MATERIAL ) {
 
-			vec2 uv = p.yz;
+			vec2 uv = p.yz * 0.2;
 			vec2 dg = circuitPattern(uv);
 			float glow = max( sin( length( p ) - 1.8 * time ) * 2.5, 0.0 );
 			float pattern = max( dg.x - 1.0, 0.0 );
