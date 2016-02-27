@@ -270,15 +270,13 @@ Intersect getRayColor( vec3 origin, vec3 ray ) {
 
 			vec2 uv = p.yz;
 			vec2 dg = circuitPattern(uv);
-
 			float glow = max( sin( length( p ) - 1.8 * time ) * 2.5, 0.0 );
-			if( dg.x < 1.1 ) glow = 0.0;
-
-			nearest.color = vec3( 0.2, 0.2, 0.2 ) + illuminationColor * glow * diffuse + specular /* * max( 0.5, shadow )*/;
-
+			float pattern = max( dg.x - 1.0, 0.0 );
+			nearest.color = vec3( 0.2, 0.2, 0.2 ) + illuminationColor * pattern * glow * diffuse + specular /* * max( 0.5, shadow )*/;
+			
 		} else if ( nearest.material == MIRROR_MATERIAL ) {
 
-			nearest.color = ( 0.5 - 0.5 * cos( time * 0.2 ) * illuminationColor * diffuse + specular )/* * max( 0.5, shadow )*/;
+			nearest.color = ( vec3( 1.0 ) - illuminationColor ) * diffuse * 0.5 + specular/* * max( 0.5, shadow )*/;
 
 		}
 
@@ -329,12 +327,12 @@ void main(void) {
 	float alpha = 1.0;
 	Intersect nearest;
 
-	for ( int i = 0; i < 3; i++ ) {
+	for ( int i = 0; i < 2; i++ ) {
 
 		nearest = getRayColor( cPos, ray );
 
 		color += alpha * nearest.color;
-		alpha *= 0.99;
+		alpha *= 0.7;
 		ray = normalize( reflect( ray, nearest.normal ) );
 		cPos = nearest.position + nearest.normal * OFFSET;
 
@@ -488,7 +486,8 @@ void main(void) {
 
 				material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
 				material.uniforms.mouse.value = mouse;
-				material.uniforms.time.value = 147.81;//timestamp * 0.001;
+				material.uniforms.time.value = timestamp * 0.001;
+				material.uniforms.time.value = 147.81;
 				material.uniforms.debugCamera.value = config.camera !== 'GLSL';
 				material.uniforms.cameraPos.value = camera.getWorldPosition();
 				material.uniforms.cameraDir.value = camera.getWorldDirection();
