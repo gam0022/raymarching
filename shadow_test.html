@@ -180,20 +180,20 @@ float getShadow( vec3 ro, vec3 rd ) {
 	float depth = EPS;
 	float bright = 1.0;
 
-	float shadowCoef = 0.8;
+	float shadowIntensity = 0.7;
 
 	for ( int i = 0; i < 30; i++ ) {
 
 		dist = sceneDist( ro + rd * depth );
 
-		if ( dist < EPS ) return 1.0 - shadowCoef;
+		if ( dist < EPS ) return 1.0 - shadowIntensity;
 
 		bright = min( bright, 8.0 * dist / depth );
 		depth += dist;
 
 	}
 
-	return 1.0 - ( 1.0 - bright ) * shadowCoef;
+	return 1.0 - ( 1.0 - bright ) * shadowIntensity;
 
 }
 
@@ -228,12 +228,12 @@ Intersect getRayColor( vec3 origin, vec3 ray ) {
 
 		if ( nearest.material == FLOOR_MATERIAL ) {
 
-			nearest.color = vec3( 0.9 ) * checkeredPattern( p ) * diffuse * max( 0.5, shadow );
+			nearest.color = vec3( 0.9 ) * checkeredPattern( p ) * diffuse * shadow;
 			
 		} else if ( nearest.material == SPHERE_MATERIAL ) {
 
 			vec3 color = vec3( 1.0, 0.2, 0.2 );
-			nearest.color = color * diffuse * max( 0.5, shadow ) + specular;
+			nearest.color = color * diffuse * shadow + specular;
 
 		}
 
