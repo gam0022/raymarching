@@ -176,23 +176,24 @@ vec3 getNormal( vec3 p ) {
 
 float getShadow( vec3 ro, vec3 rd ) {
 
-	float h = 0.0;
-	float c = 0.0;
-	float r = 1.0;
-	float shadowCoef = 0.5;
+	float dist;
+	float depth = EPS;
+	float bright = 1.0;
 
-	for ( float t = 0.0; t < 50.0; t++ ) {
+	float shadowCoef = 0.8;
 
-		h = sceneDist( ro + rd * c );
+	for ( int i = 0; i < 30; i++ ) {
 
-		if ( h < EPS ) return shadowCoef;
+		dist = sceneDist( ro + rd * depth );
 
-		r = min( r, h * 8.0 / c );
-		c += h;
+		if ( dist < EPS ) return 1.0 - shadowCoef;
+
+		bright = min( bright, 8.0 * dist / depth );
+		depth += dist;
 
 	}
 
-	return 1.0 - shadowCoef + r * shadowCoef;
+	return 1.0 - ( 1.0 - bright ) * shadowCoef;
 
 }
 
