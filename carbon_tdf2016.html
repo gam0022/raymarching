@@ -160,7 +160,7 @@ vec2 circuitPattern( vec2 p ) {
 	d = p.y - 1.0;
 	g += pow(clamp(1.0 - abs(d), 0.0, 1.0), 10000.0);
 	
-	const int iter = 18;
+	const int iter = 15;
 	for(int i = 0; i < iter; i ++)
 	{
 		cp = 0.5 + (r - 0.5) * 0.9;
@@ -268,7 +268,7 @@ Intersect getRayColor( vec3 origin, vec3 ray ) {
 
 		if ( nearest.material == CIRCUIT_MATERIAL ) {
 
-			vec2 uv = p.yz * 0.2;
+			vec2 uv = p.yz;
 			vec2 dg = circuitPattern(uv);
 			float glow = max( sin( length( p ) - 1.8 * time ) * 2.5, 0.0 );
 			float pattern = max( dg.x - 1.0, 0.0 );
@@ -488,6 +488,9 @@ void main(void) {
 				material.uniforms.mouse.value = mouse;
 				material.uniforms.time.value = timestamp * 0.001;
 				material.uniforms.time.value = 147.81;
+				material.uniforms.time.value = 62.68;
+				material.uniforms.time.value = 93.69;
+				material.uniforms.time.value = 67.86;
 				material.uniforms.debugCamera.value = config.camera !== 'GLSL';
 				material.uniforms.cameraPos.value = camera.getWorldPosition();
 				material.uniforms.cameraDir.value = camera.getWorldDirection();
