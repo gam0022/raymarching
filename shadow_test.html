@@ -234,7 +234,7 @@ float getSoft2Shadow( vec3 ro, vec3 rd ) {
 
 		if ( dist < EPS ) return 1.0 - shadowIntensity;
 
-		bright = min( bright, 4.0 * dist / depth );
+		bright = min( bright, shadowSharpness* dist / depth );
 		depth += dist;
 
 	}
@@ -466,7 +466,12 @@ void main(void) {
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'camera', [ 'GLSL', 'Orbit'/*, 'Fly'*/ ] ).name( 'Camera' );
-				gui.add( config, 'shadowType', { Hard: 0, Soft1: 1, Soft2: 2 } );
+
+				var shadowFolder = gui.addFolder('Shadow');
+				shadowFolder.add( config, 'shadowType', { Hard: 0, Soft1: 1, Soft2: 2 } ).name( 'Type');
+				shadowFolder.add( config, 'shadowIntensity', 0.0, 1.0 ).name( 'Intensity' );
+				shadowFolder.add( config, 'shadowSharpness', 0.0, 30.0 ).name( 'Sharpness' );
+				shadowFolder.open();
 
 				var objFolder = gui.addFolder('Obj');
 				objFolder.add( config, 'objAutoMove' ).name( 'Auto Move' );
