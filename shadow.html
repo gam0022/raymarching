@@ -8,7 +8,7 @@ http://opensource.org/licenses/mit-license.php
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<title>three.js webgl - raymarching - reflect</title>
+		<title>three.js webgl - raymarching - shadow</title>
 		<style type="text/css">
 			body {
 				background-color: black;
@@ -43,7 +43,7 @@ http://opensource.org/licenses/mit-license.php
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl raymarching example -
-			reflect by <a href="https://github.com/gam0022" target="_blank">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank">article in Japanese</a>)
+			shadow by <a href="https://github.com/gam0022" target="_blank">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank">article in Japanese</a>)
 		</div>
 
 		<script id="fragment_shader" type="x-shader/x-fragment">
@@ -234,7 +234,7 @@ float getSoft2Shadow( vec3 ro, vec3 rd ) {
 
 		if ( dist < EPS ) return 1.0 - shadowIntensity;
 
-		bright = min( bright, shadowSharpness* dist / depth );
+		bright = min( bright, shadowSharpness * dist / depth );
 		depth += dist;
 
 	}
@@ -538,10 +538,10 @@ void main(void) {
 				var pos = camera.getWorldPosition();
 				var dir = camera.getWorldDirection();
 
-				document.getElementById( 'info' ).innerHTML = ""
-					+ "pos:" + pos.x + ", " + pos.y + ", " + pos.z + "<br />"
-					+ "dir:" + dir.x + ", " + dir.y + ", " + dir.z + "<br />"
-					+ "time:" + timestamp * 0.001;
+				//document.getElementById( 'info' ).innerHTML = ""
+				//	+ "pos:" + pos.x + ", " + pos.y + ", " + pos.z + "<br />"
+				//	+ "dir:" + dir.x + ", " + dir.y + ", " + dir.z + "<br />"
+				//	+ "time:" + timestamp * 0.001;
 
 			}
 
