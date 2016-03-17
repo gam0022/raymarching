@@ -460,8 +460,12 @@ void main(void) {
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'camera', [ 'GLSL', 'Orbit'/*, 'Fly'*/ ] ).name( 'Camera' );
 				gui.add( config, 'shadowType', { Hard: 0, Soft1: 1, Soft2: 2 } );
-				gui.add( config, 'objAutoMove' ).name( 'Obj Auto Move' );
-				gui.add( config, 'objY', -1.0, 10.0 ).name( 'Obj Y' ).listen();
+
+				var objFolder = gui.addFolder('Obj');
+				objFolder.add( config, 'objAutoMove' ).name( 'Auto Move' );
+				objFolder.add( config, 'objY', -1.0, 10.0 ).name( 'Pos Y' ).listen();
+				objFolder.open();
+
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( function( value ) {
 
 					if ( value !== 'full' ) {
