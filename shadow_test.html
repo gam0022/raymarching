@@ -62,8 +62,12 @@ uniform bool debugCamera;
 uniform vec3 cameraPos;
 uniform vec3 cameraDir;
 
-// other
+// shadow
 uniform int shadowType;
+uniform float shadowIntensity;
+uniform float shadowSharpness;
+
+// obj
 uniform float objY;
 
 // consts
@@ -183,13 +187,11 @@ float getHardShadow( vec3 ro, vec3 rd ) {
 	float dist;
 	float depth = EPS;
 
-	float shadowIntensity = 0.7;
-
 	for ( int i = 0; i < 30; i++ ) {
 
 		dist = sceneDist( ro + rd * depth );
 
-		if ( dist < EPS ) return 0.0;
+		if ( dist < EPS ) return 1.0 - shadowIntensity;
 
 		depth += dist;
 
@@ -205,15 +207,13 @@ float getSoft1Shadow( vec3 ro, vec3 rd ) {
 	float depth = EPS;
 	float bright = 1.0;
 
-	float shadowIntensity = 0.7;
-
 	for ( int i = 0; i < 30; i++ ) {
 
 		dist = sceneDist( ro + rd * depth );
 
 		if ( dist < EPS ) return 1.0 - shadowIntensity;
 
-		bright = min( bright, 4.0 * dist );
+		bright = min( bright, shadowSharpness * dist );
 		depth += dist;
 
 	}
@@ -227,8 +227,6 @@ float getSoft2Shadow( vec3 ro, vec3 rd ) {
 	float dist;
 	float depth = EPS;
 	float bright = 1.0;
-
-	float shadowIntensity = 0.7;
 
 	for ( int i = 0; i < 30; i++ ) {
 
@@ -394,9 +392,14 @@ void main(void) {
 
 				},
 				camera: 'Orbit',
+
 				shadowType: 2,
+				shadowIntensity: 0.7,
+				shadowSharpness: 6.0,
+
 				objAutoMove: true,
 				objY: 0.0,
+
 				resolution: '512',
 			};
 
@@ -420,7 +423,11 @@ void main(void) {
 						debugCamera: { type: 'i', value: config.camera !== 'GLSL' },
 						cameraPos: { type: 'v3', value: camera.getWorldPosition() },
 						cameraDir: { type: 'v3', value: camera.getWorldDirection() },
+
 						shadowType: { type: 'i', value: config.shadowType },
+						shadowIntensity: { type: 'f', value: config.shadowIntensity },
+						shadowSharpness: { type: 'f', value: config.shadowSharpness },
+
 						objY: { type: 'f', value: config.objY },
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
@@ -511,7 +518,12 @@ void main(void) {
 				material.uniforms.debugCamera.value = config.camera !== 'GLSL';
 				material.uniforms.cameraPos.value = camera.getWorldPosition();
 				material.uniforms.cameraDir.value = camera.getWorldDirection();
+
 				material.uniforms.shadowType.value = config.shadowType;
+				material.uniforms.shadowIntensity.value = config.shadowIntensity;
+				material.uniforms.shadowSharpness.value = config.shadowSharpness;
+				
+
 				material.uniforms.objY.value = config.objY;
 				renderer.render( scene, dummyCamera );
 
