@@ -71,7 +71,7 @@ uniform float shadowSharpness;
 uniform float objY;
 
 // consts
-const float EPS = 0.0001;
+const float EPS = 0.00001;
 const float OFFSET = EPS * 100.0;
 const float PI = 3.14159;
 
@@ -305,7 +305,7 @@ Intersect getRayColor( vec3 origin, vec3 ray ) {
 
 	} else {
 
-		nearest.color = vec3(0.1);
+		nearest.color = vec3( 0.2 );
 		nearest.isHit = false;
 
 	}
