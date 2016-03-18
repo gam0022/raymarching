@@ -72,7 +72,7 @@ uniform float objY;
 
 // consts
 const float EPS = 0.0001;
-const float OFFSET = EPS * 100.0;
+const float OFFSET = EPS * 2000.0;
 const float PI = 3.14159;
 
 
@@ -213,7 +213,7 @@ float getSoft1Shadow( vec3 ro, vec3 rd ) {
 
 		if ( dist < EPS ) return shadowIntensity;
 
-		bright = min( bright, shadowSharpness * dist * 200.0 );
+		bright = min( bright, shadowSharpness * dist );
 
 		depth += dist;
 
@@ -394,7 +394,7 @@ void main(void) {
 				},
 				camera: 'Orbit',
 
-				shadowType: 1,
+				shadowType: 2,
 				shadowIntensity: 0.3,
 				shadowSharpness: 8.0,
 
